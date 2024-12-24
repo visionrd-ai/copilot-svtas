@@ -186,7 +186,11 @@ class RawFrameStreamSegmentationDataset(data.IterableDataset):
                     content = file_ptr.read().split('\n')[:-1]
                     classes = np.zeros(len(content), dtype='int64')
                     for i in range(len(content)):
+
+                        ### for GTEA ###
                         classes[i] = self.actions_dict[content[i]]
+                        ### for THAL ###
+                        # classes[i] = self.actions_dict[content[i].split(':')[-1].strip()]
                     
                     # caculate sliding num
                     if max_len < len(content):

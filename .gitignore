@@ -141,3 +141,9 @@ output/
 # debug
 .vscode/
 .idea/
+
+data/
+*.pkl
+*.png
+*.jpg 
+*.jpeg 

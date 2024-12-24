@@ -18,6 +18,9 @@ from ...builder import build_head
 
 from ...builder import ARCHITECTURE
 
+
+from model.backbones.image.resnet import ResNet
+
 @ARCHITECTURE.register()
 class StreamSegmentation2D(nn.Module):
     def __init__(self,
@@ -27,16 +30,29 @@ class StreamSegmentation2D(nn.Module):
                  loss=None):
         super().__init__()
         self.backbone = build_backbone(backbone)
+        # backbone['pretrained'] = 'data/cleaned.pth'
+        # self.det_backbone = build_backbone(backbone)
+
+        self.det_backbone =  ResNet(depth=50, pretrained='data/cleaned.pth')
         self.neck = build_neck(neck)
         self.head = build_head(head)
 
+
+
+        # self.backbone.init_weights()
+        # self.det_backbone.init_weights()
+
         self.init_weights()
-        
         self.sample_rate = head.sample_rate
 
     def init_weights(self):
         if self.backbone is not None:
             self.backbone.init_weights(child_model=False, revise_keys=[(r'backbone.', r'')])
+
+        if self.det_backbone is not None:
+            self.det_backbone.init_weights(child_model=False, revise_keys=[(r'backbone.', r''), (r'conv.net', 'conv')])
+            for param in self.det_backbone.parameters(): 
+                param.requires_grad=False
         if self.neck is not None:
             self.neck.init_weights()
         if self.head is not None:
@@ -65,14 +81,15 @@ class StreamSegmentation2D(nn.Module):
              # masks.shape [N * T, 1, 1, 1]
             backbone_masks = torch.reshape(masks[:, :, ::self.sample_rate], [-1]).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
             feature = self.backbone(imgs, backbone_masks)
+            feature_det = self.det_backbone(imgs, backbone_masks)
+
         else:
             feature = imgs
-
+        feature = 0.5*feature+0.5*feature_det
         # feature [N * T , F_dim, 7, 7]
         # step 3 extract memory feature
         if self.neck is not None:
-            seg_feature = self.neck(
-                feature, masks[:, :, ::self.sample_rate])
+            seg_feature = self.neck(feature, masks[:, :, ::self.sample_rate])
             
         else:
             seg_feature = feature
