@@ -41,7 +41,6 @@ class SegmentationLoss(nn.Module):
         # masks shape [N T]
         head_score = model_output
         masks, labels, precise_sliding_num = input_data["masks"], input_data["labels"], input_data['precise_sliding_num']
-        
         _, b, _, t = head_score.shape
 
         loss = 0.

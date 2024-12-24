@@ -157,7 +157,7 @@ class ResNetTSM(ResNet):
     """
 
     def __init__(self,
-                 depth,
+                 depth=50,
                  modality="RGB",
                  clip_seg_num=8,
                  is_shift=True,
