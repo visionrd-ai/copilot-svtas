@@ -17,27 +17,12 @@ from ...builder import build_neck
 from ...builder import build_head
 
 from ...builder import ARCHITECTURE
-import torchvision
-from torchvision.models import EfficientNet_V2_S_Weights
 
 
 from model.backbones.image.resnet import ResNet
-
-
-class conv_bn_relu(torch.nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, bias=False):
-        super(conv_bn_relu, self).__init__()
-        self.conv = torch.nn.Conv2d(in_channels, out_channels, kernel_size,
-                                    stride=stride, padding=padding, dilation=dilation, bias=bias)
-        self.bn = torch.nn.BatchNorm2d(out_channels)
-        self.relu = torch.nn.ReLU()
-
-    def forward(self, x):
-        x = self.conv(x)
-        x = self.bn(x)
-        x = self.relu(x)
-        return x
-
+from model.backbones.video.resnet_tsm import ResNetTSM
+from model.necks.avg_pool_neck import AvgPoolNeck
+from model.heads.segmentation.memory_tcn import MemoryTCNHead
 
 @ARCHITECTURE.register()
 class StreamSegmentation2D(nn.Module):
@@ -47,31 +32,16 @@ class StreamSegmentation2D(nn.Module):
                  head=None,
                  loss=None):
         super().__init__()
-        self.backbone = build_backbone(backbone)
-        # backbone['pretrained'] = 'data/cleaned.pth'
-        # self.det_backbone = build_backbone(backbone)
-
-        self.det_weights = torch.load('new_cleaned.pth')
-        self.det_backbone =  ResNet(depth=50, pretrained='new_cleaned.pth')
-        # self.det_weights = torch.load('efficientEgoNet_bb_512x512.pth', map_location='cpu')
-        # self.det_backbone = torchvision.models.efficientnet_v2_s(weights=EfficientNet_V2_S_Weights)
-        # self.det_backbone =  torch.nn.Sequential(*(list(self.det_backbone.children())[:-2]))
+        # self.backbone = build_backbone(backbone)
+        self.backbone = ResNetTSM(depth=50, pretrained="data/tsm_r50_dense_256p_1x1x8_100e_kinetics400_rgb_20200727-e1e0c785.pth" ,clip_seg_num=32, shift_div= 8, out_indices= (3, ))
+        self.det_backbone =  ResNet(depth=50, pretrained='data/cleaned.pth')
+        self.neck = AvgPoolNeck(num_classes= 5, in_channels= 2048, clip_seg_num= 32, drop_ratio= 0.5 ,need_pool= True)
+        self.head = MemoryTCNHead(num_stages= 1, num_layers= 4, num_f_maps= 64 ,dim= 2048, num_classes= 5 ,sample_rate= 4)
 
 
-        self.neck = build_neck(neck)
-        self.head = build_head(head)
 
         # self.backbone.init_weights()
         # self.det_backbone.init_weights()
-
-        self.feat_combine = torch.nn.Sequential(
-            conv_bn_relu(in_channels=4096, out_channels=2048, kernel_size=3, padding=1, dilation=1),
-            torch.nn.Conv2d(in_channels=2048, out_channels=2048, kernel_size=1),
-        )
-
-        self.feat_refine = torch.nn.Sequential(
-            conv_bn_relu(in_channels=2048, out_channels=2048, kernel_size=3, padding=1, dilation=1)
-        )
 
         self.init_weights()
         self.sample_rate = head.sample_rate
@@ -81,13 +51,9 @@ class StreamSegmentation2D(nn.Module):
             self.backbone.init_weights(child_model=False, revise_keys=[(r'backbone.', r'')])
 
         if self.det_backbone is not None:
-            # self.det_backbone.init_weights(child_model=False, revise_keys=[(r'backbone.', r''), (r'conv.net', 'conv')])
-            self.det_backbone.load_state_dict(self.det_weights, strict=True)
-            print('det backbone loaded')
+            self.det_backbone.init_weights(child_model=False, revise_keys=[(r'backbone.', r''), (r'conv.net', 'conv')])
             for param in self.det_backbone.parameters(): 
                 param.requires_grad=False
-            print('det backbone freezed')
-
         if self.neck is not None:
             self.neck.init_weights()
         if self.head is not None:
@@ -100,16 +66,6 @@ class StreamSegmentation2D(nn.Module):
             self.neck._clear_memory_buffer()
         if self.head is not None:
             self.head._clear_memory_buffer()
-    
-    def feature_fusion(self, temporal_fet, spatial_feat):
-
-        x_1 = temporal_fet
-        x_2 = spatial_feat
-        x_concat = torch.cat([x_1, x_2], dim=1)
-        x_3 = self.feat_combine(x_concat)
-        feature = self.feat_refine(x_3)
-
-        return feature
 
     def forward(self, input_data):
         masks = input_data['masks']
@@ -127,13 +83,10 @@ class StreamSegmentation2D(nn.Module):
             backbone_masks = torch.reshape(masks[:, :, ::self.sample_rate], [-1]).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
             feature = self.backbone(imgs, backbone_masks)
             feature_det = self.det_backbone(imgs, backbone_masks)
-            # feature_det = self.det_backbone(imgs)
 
         else:
             feature = imgs
-        
-        feature = self.feature_fusion(feature, feature_det)
-        # feature = 0.5*feature+0.5*feature_det
+        feature = 0.5*feature+0.5*feature_det
         # feature [N * T , F_dim, 7, 7]
         # step 3 extract memory feature
         if self.neck is not None:

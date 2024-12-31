@@ -188,9 +188,9 @@ class RawFrameStreamSegmentationDataset(data.IterableDataset):
                     for i in range(len(content)):
 
                         ### for GTEA ###
-                        classes[i] = self.actions_dict[content[i]]
+                        # classes[i] = self.actions_dict[content[i]]
                         ### for THAL ###
-                        # classes[i] = self.actions_dict[content[i].split(':')[-1].strip()]
+                        classes[i] = self.actions_dict[content[i].split(':')[-1].strip()]
                     
                     # caculate sliding num
                     if max_len < len(content):
