@@ -22,7 +22,7 @@ from torchvision.models import EfficientNet_V2_S_Weights
 
 
 from model.backbones.image.resnet import ResNet
-
+from model.necks.cross_attn import CrossAttention
 
 class conv_bn_relu(torch.nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, bias=False):
@@ -64,14 +64,15 @@ class StreamSegmentation2D(nn.Module):
         # self.backbone.init_weights()
         # self.det_backbone.init_weights()
 
-        self.feat_combine = torch.nn.Sequential(
-            conv_bn_relu(in_channels=4096, out_channels=2048, kernel_size=3, padding=1, dilation=1),
-            torch.nn.Conv2d(in_channels=2048, out_channels=2048, kernel_size=1),
-        )
+        # self.feat_combine = torch.nn.Sequential(
+        #     conv_bn_relu(in_channels=4096, out_channels=2048, kernel_size=3, padding=1, dilation=1),
+        #     torch.nn.Conv2d(in_channels=2048, out_channels=2048, kernel_size=1),
+        # )
 
-        self.feat_refine = torch.nn.Sequential(
-            conv_bn_relu(in_channels=2048, out_channels=2048, kernel_size=3, padding=1, dilation=1)
-        )
+        # self.feat_refine = torch.nn.Sequential(
+        #     conv_bn_relu(in_channels=2048, out_channels=2048, kernel_size=3, padding=1, dilation=1)
+        # )
+        self.cross_attn = CrossAttention(dim=2048, num_heads=8)
 
         self.init_weights()
         self.sample_rate = head.sample_rate
@@ -105,9 +106,10 @@ class StreamSegmentation2D(nn.Module):
 
         x_1 = temporal_fet
         x_2 = spatial_feat
-        x_concat = torch.cat([x_1, x_2], dim=1)
-        x_3 = self.feat_combine(x_concat)
-        feature = self.feat_refine(x_3)
+        feature = self.cross_attn(x_1, x_2)
+        # x_concat = torch.cat([x_1, x_2], dim=1)
+        # x_3 = self.feat_combine(x_concat)
+        # feature = self.feat_refine(x_3)
 
         return feature
 

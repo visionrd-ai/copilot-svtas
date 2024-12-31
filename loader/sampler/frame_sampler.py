@@ -9,6 +9,7 @@ FilePath     : /ETESVS/loader/sampler/frame_sampler.py
 import numpy as np
 import random
 from PIL import Image
+import albumentations as A
 from ..builder import SAMPLER
 
 class VideoFrameSample():
@@ -59,7 +60,8 @@ class VideoStreamSampler():
                  sliding_window=60,
                  ignore_index=-100,
                  channel_mode="RGB",
-                 sample_mode='random'
+                 sample_mode='random',
+                 aug=[]
                  ):
         self.sample_rate = sample_rate
         self.is_train = is_train
@@ -68,7 +70,12 @@ class VideoStreamSampler():
         self.ignore_index = ignore_index
         self.channel_mode = channel_mode
         self.sample = VideoFrameSample(mode = sample_mode)
-    
+        self.transform = A.ReplayCompose([
+                    A.RandomBrightnessContrast(p=0.6),
+                    A.HueSaturationValue(hue_shift_limit=(-10, 10), sat_shift_limit=(-10, 10), val_shift_limit=(-10, 10), p=0.3),
+                    A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.01, rotate_limit=4, p=0.1),
+                    A.ImageCompression(quality_lower=75, quality_upper=95, p=0.4),
+                ])
     def _all_valid_frames(self, start_frame, end_frame, video_len, container, labels):
         imgs = []
         vid_end_frame = end_frame
@@ -79,6 +86,17 @@ class VideoStreamSampler():
         frames_select = container.get_batch(frames_idx)
         # dearray_to_img
         np_frames = frames_select.asnumpy()
+
+        ### augmentations ### 
+        first_frame = np_frames[0]
+        replayed = self.transform(image=first_frame)
+        replay_data = replayed['replay']  
+        augmented_video = np.empty_like(np_frames)
+        for i in range(np_frames.shape[0]):
+            augmented_frame = A.ReplayCompose.replay(replay_data, image=np_frames[i])['image']
+            augmented_video[i] = augmented_frame
+        np_frames = augmented_video
+        
         for i in range(np_frames.shape[0]):
             imgbuf = np_frames[i].copy()
             imgs.append(Image.fromarray(imgbuf, mode=self.channel_mode))

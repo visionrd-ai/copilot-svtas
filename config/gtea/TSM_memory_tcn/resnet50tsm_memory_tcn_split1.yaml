@@ -2,7 +2,7 @@ MODEL:
     architecture: "StreamSegmentation2D"
     backbone:
         name: "ResNetTSM"
-        pretrained: "data/tsm_r50_dense_256p_1x1x8_100e_kinetics400_rgb_20200727-e1e0c785.pth"
+        pretrained: "clsLess_tsm_r50_256p_1x1x8_kinetics400_rgb_.pth"
         clip_seg_num: 32
         shift_div: 8
         out_indices: (3, )
@@ -102,7 +102,7 @@ PIPELINE: #PIPELINE field
             backend: "decord"
         sample:
             name: "VideoStreamSampler"
-            is_train: "./data/resnet_tsm_224_new.pth"
+            is_train: False
             sample_rate: 4
             clip_seg_num: 32
             sliding_window: 128
@@ -138,7 +138,7 @@ METRIC:
     score_output: True
 
 
-model_name: "ResnetTSM_Memory_TCN_thal_latest"
-log_interval: 4 #Optional, the interal of logger, default:10
+model_name: "ResnetTSM_Memory_TCN_thal_new_8+6+3_aug_resume"
+log_interval: 1 #Optional, the interal of logger, default:10
 epochs: 50 #Mandatory, total epoch
 save_interval: 50

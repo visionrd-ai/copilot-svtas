@@ -103,9 +103,9 @@ def train(cfg,
 
     # Resume
     resume_epoch = cfg.get("resume_epoch", 0)
-    if resume_epoch:
-        path_checkpoint = osp.join(output_dir,
-                            model_name + f"_epoch_{resume_epoch:05d}" + ".pkl")
+    if weights:
+        path_checkpoint = weights#osp.join(output_dir,
+                           # model_name + f"_epoch_{resume_epoch:05d}" + ".pkl")
         
         if local_rank < 0:
             checkpoint = torch.load(path_checkpoint)

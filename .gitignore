@@ -147,3 +147,6 @@ data/
 *.png
 *.jpg 
 *.jpeg 
+*.pt 
+*.MOV 
+*.pth
