@@ -1,5 +1,5 @@
 MODEL:
-    architecture: "StreamSegmentation2D"
+    architecture: "StreamSegmentation2DMultiLabel"
     backbone:
         name: "ResNetTSM"
         pretrained: "clsLess_tsm_r50_256p_1x1x8_kinetics400_rgb_.pth"
@@ -8,34 +8,46 @@ MODEL:
         out_indices: (3, )
     neck:
         name: "AvgPoolNeck"
-        num_classes: 5
+        num_classes: 21
         in_channels: 2048
         clip_seg_num: 32
         drop_ratio: 0.5
         need_pool: True
     head:
-        name: "MemoryTCNHead"
-        num_stages: 1
-        num_layers: 4
-        num_f_maps: 64
-        dim: 2048
-        num_classes: 5
+        action_head:
+            name: "MemoryTCNHead"
+            num_stages: 1
+            num_layers: 4
+            num_f_maps: 64
+            dim: 2048
+            num_classes: 5
+            sample_rate: 4
+        branch_head:
+            name: "MemoryTCNHead"
+            num_stages: 1
+            num_layers: 4
+            num_f_maps: 64
+            dim: 2048
+            num_classes: 16
+            sample_rate: 4
         sample_rate: 4
     loss:
-        name: "SegmentationLoss"
-        num_classes: 5
+        name: "SegmentationLossMultiLabel"
+        num_classes_action: 5
+        num_classes_branches: 16
         sample_rate: 4
         smooth_weight: 0.15
         ignore_index: -100
 
 POSTPRECESSING:
-    name: "StreamScorePostProcessing"
-    num_classes: 5
+    name: "StreamScorePostProcessingMultiLabel"
+    num_action_classes: 5
+    num_branch_classes: 16
     clip_seg_num: 32
     sliding_window: 128
     sample_rate: 4
     ignore_index: -100
-
+  
 COLLATE:
     name: "StreamBatchCompose"
     to_tensor_keys: ["imgs", "labels", "masks", "precise_sliding_num"]
@@ -45,24 +57,26 @@ DATASET: #DATASET field
     video_batch_size: 2
     num_workers: 0
     train:
-        name: "RawFrameStreamSegmentationDataset"
+        name: "RawFrameStreamSegmentationDatasetMultiLabel"
         data_prefix: "./" #Mandatory, train data root path
         file_path: "./data/thal/splits/train.split1.bundle" #Mandatory, train data index file path
         videos_path: "./data/thal/Videos"
-        gt_path: "./data/thal/groundTruth"
-        actions_map_file_path: "./data/thal/mapping.txt"
+        gt_path: "./data/thal/groundTruth_split"
+        actions_map_file_path: "./data/thal/mapping_tasks.txt"
+        branches_map_file_path: "./data/thal/mapping_branches.txt"
         dataset_type: "gtea"
         train_mode: True
         sliding_window: 128
         clip_seg_num: 32
         sample_rate: 4
     test:
-        name: "RawFrameStreamSegmentationDataset"
+        name: "RawFrameStreamSegmentationDatasetMultiLabel"
         data_prefix: "./" #Mandatory, train data root path
         file_path: "./data/thal/splits/test.split1.bundle" #Mandatory, train data index file path
         videos_path: "./data/thal/Videos"
-        gt_path: "./data/thal/groundTruth"
-        actions_map_file_path: "./data/thal/mapping.txt"
+        gt_path: "./data/thal/groundTruth_split"
+        actions_map_file_path: "./data/thal/mapping_tasks.txt"
+        branches_map_file_path: "./data/thal/mapping_branches.txt"
         dataset_type: "gtea"
         train_mode: False
         sliding_window: 128
@@ -76,7 +90,7 @@ PIPELINE: #PIPELINE field
             name: "VideoDecoder"
             backend: "decord"
         sample:
-            name: "VideoStreamSampler"
+            name: "VideoStreamSamplerMultiLabel"
             is_train: True
             sample_rate: 4
             clip_seg_num: 32
@@ -86,9 +100,9 @@ PIPELINE: #PIPELINE field
             name: "VideoStreamTransform"
             transform_list:
                 - Resize:
-                    size: [256, 320]
-                - RandomCrop:
-                    size: 224
+                    size: [224, 224] # 256 320
+                # - RandomCrop:
+                #     size: 224
                 - RandomHorizontalFlip:
                 - ToTensor:
                 - Normalize:
@@ -101,7 +115,7 @@ PIPELINE: #PIPELINE field
             name: "VideoDecoder"
             backend: "decord"
         sample:
-            name: "VideoStreamSampler"
+            name: "VideoStreamSamplerMultiLabel"
             is_train: False
             sample_rate: 4
             clip_seg_num: 32
@@ -111,9 +125,9 @@ PIPELINE: #PIPELINE field
             name: "VideoStreamTransform"
             transform_list:
                 - Resize:
-                    size: [256, 320]
-                - CenterCrop:
-                    size: 224
+                    size: [224, 224]
+                # - CenterCrop:
+                #     size: 224
                 - ToTensor:
                 - Normalize:
                     mean: [0.485, 0.456, 0.406]
@@ -133,12 +147,12 @@ LRSCHEDULER:
 METRIC:
     name: "TASegmentationMetric"
     overlap: [.1, .25, .5]
-    actions_map_file_path: "./data/thal/mapping.txt"
+    actions_map_file_path: "./data/thal/mapping_split.txt"
     file_output: True
     score_output: True
 
 
-model_name: "ResnetMemTCN_Thal_Areas_45_4_32SW"
+model_name: "ThalMultiHead_Colored_SW128"
 log_interval: 1 #Optional, the interal of logger, default:10
-epochs: 150 #Mandatory, total epoch
+epochs: 200 #Mandatory, total epoch
 save_interval: 50

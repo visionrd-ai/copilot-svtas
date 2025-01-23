@@ -1,0 +1,5 @@
+0 tape
+1 clip
+2 background
+3 check_tag
+4 fusebox

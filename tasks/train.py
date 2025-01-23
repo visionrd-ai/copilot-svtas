@@ -247,7 +247,6 @@ def train(cfg,
             if local_rank <= 0:
                 # metric output
                 Metric_dict = runner.Metric.accumulate()
-                
                 if Metric_dict["Acc"] > best:
                     best = Metric_dict["Acc"]
                     best_flag = True

@@ -148,5 +148,11 @@ data/
 *.jpg 
 *.jpeg 
 *.pt 
+*.pth
 *.MOV 
 *.pth
+output/
+*.mp4
+*.zip
+test/ 
+*.tar.xz
