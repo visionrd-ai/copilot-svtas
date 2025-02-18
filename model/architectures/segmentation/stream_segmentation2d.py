@@ -51,8 +51,8 @@ class StreamSegmentation2D(nn.Module):
         # backbone['pretrained'] = 'data/cleaned.pth'
         # self.det_backbone = build_backbone(backbone)
 
-        self.det_weights = torch.load('new_cleaned.pth')
-        self.det_backbone =  ResNet(depth=50, pretrained='new_cleaned.pth')
+        self.det_weights = torch.load('data/ew_cleaned.pth')
+        self.det_backbone =  ResNet(depth=50, pretrained='data/new_cleaned.pth')
         # self.det_backbone = ResNetModel.from_pretrained("microsoft/resnet-50")
         # self.det_weights = {key.replace('backbone.', ''):val for key, val in torch.load('data/last_epoch_model.pth').items() if key.startswith('backbone.')}
         # self.det_weights = torch.load('efficientEgoNet_bb_512x512.pth', map_location='cpu')
@@ -167,8 +167,8 @@ class StreamSegmentation2DMultiLabel(nn.Module):
         # backbone['pretrained'] = 'data/cleaned.pth'
         # self.det_backbone = build_backbone(backbone)
 
-        self.det_weights = torch.load('new_cleaned.pth')
-        self.det_backbone =  ResNet(depth=50, pretrained='new_cleaned.pth')
+        self.det_weights = torch.load('data/new_cleaned.pth')
+        self.det_backbone =  ResNet(depth=50, pretrained='data/new_cleaned.pth')
         # self.det_backbone = ResNetModel.from_pretrained("microsoft/resnet-50")
         # self.det_weights = {key.replace('backbone.', ''):val for key, val in torch.load('data/last_epoch_model.pth').items() if key.startswith('backbone.')}
         # self.det_weights = torch.load('efficientEgoNet_bb_512x512.pth', map_location='cpu')
@@ -178,7 +178,6 @@ class StreamSegmentation2DMultiLabel(nn.Module):
         self.neck = build_neck(neck)
         self.action_head = build_head(head['action_head'])
         self.branch_head = build_head(head['branch_head'])
-
 
         # self.backbone.init_weights()
         # self.det_backbone.init_weights()

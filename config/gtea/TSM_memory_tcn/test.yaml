@@ -59,7 +59,7 @@ DATASET: #DATASET field
     train:
         name: "RawFrameStreamSegmentationDatasetMultiLabel"
         data_prefix: "./" #Mandatory, train data root path
-        file_path: "./data/thal/splits/train.split1.bundle" #Mandatory, train data index file path
+        file_path: "./data/thal/splits/train.split2.bundle" #Mandatory, train data index file path
         videos_path: "./data/thal/Videos"
         gt_path: "./data/thal/groundTruth_split"
         actions_map_file_path: "./data/thal/mapping_tasks.txt"
@@ -72,7 +72,7 @@ DATASET: #DATASET field
     test:
         name: "RawFrameStreamSegmentationDatasetMultiLabel"
         data_prefix: "./" #Mandatory, train data root path
-        file_path: "./data/thal/splits/test.split1.bundle" #Mandatory, train data index file path
+        file_path: "./data/thal/splits/test.split2.bundle" #Mandatory, train data index file path
         videos_path: "./data/thal/Videos"
         gt_path: "./data/thal/groundTruth_split"
         actions_map_file_path: "./data/thal/mapping_tasks.txt"
