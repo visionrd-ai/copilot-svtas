@@ -9,6 +9,7 @@ FilePath     : /ETESVS/loader/sampler/frame_sampler.py
 import numpy as np
 import random
 from PIL import Image
+import cv2 
 import albumentations as A
 from ..builder import SAMPLER
 
@@ -72,9 +73,9 @@ class VideoStreamSampler():
         self.sample = VideoFrameSample(mode = sample_mode)
         self.transform = A.ReplayCompose([
                     A.RandomBrightnessContrast(p=0.6),
-                    A.HueSaturationValue(hue_shift_limit=(-10, 10), sat_shift_limit=(-10, 10), val_shift_limit=(-10, 10), p=0.3),
-                    A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.01, rotate_limit=4, p=0.1),
-                    A.ImageCompression(quality_lower=75, quality_upper=95, p=0.4),
+                    A.HueSaturationValue(hue_shift_limit=(-10, 10), sat_shift_limit=(-10, 10), val_shift_limit=(-10, 10), p=1),
+                    A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.01, rotate_limit=4, p=1),
+                    A.ImageCompression(quality_lower=75, quality_upper=95, p=1),
                 ])
     def _all_valid_frames(self, start_frame, end_frame, video_len, container, labels):
         imgs = []
@@ -96,7 +97,7 @@ class VideoStreamSampler():
             augmented_frame = A.ReplayCompose.replay(replay_data, image=np_frames[i])['image']
             augmented_video[i] = augmented_frame
         np_frames = augmented_video
-        
+        import pdb; pdb.set_trace()
         for i in range(np_frames.shape[0]):
             imgbuf = np_frames[i].copy()
             imgs.append(Image.fromarray(imgbuf, mode=self.channel_mode))
@@ -211,10 +212,38 @@ class VideoStreamSamplerMultiLabel():
         self.sample = VideoFrameSample(mode = sample_mode)
         self.transform = A.ReplayCompose([
                     A.RandomBrightnessContrast(p=0.6),
-                    A.HueSaturationValue(hue_shift_limit=(-10, 10), sat_shift_limit=(-10, 10), val_shift_limit=(-10, 10), p=0.3),
-                    A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.01, rotate_limit=4, p=0.1),
-                    A.ImageCompression(quality_lower=75, quality_upper=95, p=0.4),
+                    A.HueSaturationValue(hue_shift_limit=(-30, 30), sat_shift_limit=(-30, 30), val_shift_limit=(-30, 30), p=0.6),
+                    A.ShiftScaleRotate(shift_limit=0.25, scale_limit=0.4, rotate_limit=15, p=0.6),
+                    A.ImageCompression(quality_lower=75, quality_upper=95, p=0.6),
                 ])
+        self.visualize = False
+        
+    def save_video(self, np_frames: np.ndarray, output_path: str, fps: int = 30) -> None:
+        """
+        Saves a numpy array of shape (num_frames, height, width, channels) as a video file.
+        Args:
+            np_frames (np.ndarray): Array containing video frames.
+            output_path (str): Path to save the output video file.
+            fps (int, optional): Frames per second. Defaults to 30.
+        """
+        # Extract frame dimensions
+        num_frames, height, width, channels = np_frames.shape
+        assert channels == 3, "Frames should have 3 channels (RGB)."
+
+        # Define the video codec and create a VideoWriter object
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec for .mp4
+        out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+
+        # Write each frame to the video
+        for frame in np_frames:
+            # Convert RGB (numpy default) to BGR (OpenCV default)
+            frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            out.write(frame_bgr)
+
+        # Release the video writer
+        out.release()
+        print(f'Video saved to {output_path}')
+
     def _all_valid_frames(self, start_frame, end_frame, video_len, container, labels, branch_labels):
         imgs = []
         vid_end_frame = end_frame
@@ -237,7 +266,10 @@ class VideoStreamSamplerMultiLabel():
             augmented_frame = A.ReplayCompose.replay(replay_data, image=np_frames[i])['image']
             augmented_video[i] = augmented_frame
         np_frames = augmented_video
-        
+
+        if self.visualize:
+            self.save_video(np_frames=np_frames, output_path='test.mp4', fps=1)
+
         for i in range(np_frames.shape[0]):
             imgbuf = np_frames[i].copy()
             imgs.append(Image.fromarray(imgbuf, mode=self.channel_mode))
