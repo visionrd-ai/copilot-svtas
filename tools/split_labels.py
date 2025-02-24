@@ -13,7 +13,7 @@ def process_label_files(input_folder, output_folder):
             # Output file paths
             base_name = os.path.splitext(filename)[0]
             output_b_number_path = os.path.join(output_folder, f"{base_name}_branch.txt")
-            output_word_path = os.path.join(output_folder, f"{base_name}_action.txt")
+            output_word_path = os.path.join(output_folder, f"{base_name}.txt")
           
             with open(input_path, "r") as infile, \
                  open(output_b_number_path, "w") as b_number_file, \
@@ -42,8 +42,8 @@ def process_label_files(input_folder, output_folder):
     print(f"Processing complete. Output files saved in {output_folder}")
 
 # Specify the input and output folder paths
-input_folder = "data/thal/groundTruth"
-output_folder = "data/thal/groundTruth_split"
+input_folder = "data/thal_new/groundTruth"
+output_folder = "data/thal_new/groundTruth_split"
 
 # Process the files
 process_label_files(input_folder, output_folder)

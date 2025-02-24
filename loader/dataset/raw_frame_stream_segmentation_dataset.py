@@ -537,8 +537,10 @@ class RawFrameStreamSegmentationDatasetMultiLabel(data.IterableDataset):
                         ### for GTEA ###
                         # classes[i] = self.actions_dict[content[i]]
                         ### for THAL ###
-                        classes[i] = self.actions_dict[content[i].split(':')[-1].strip()]
-                    
+                        try:
+                            classes[i] = self.actions_dict[content[i].split(':')[-1].strip()]
+                        except: 
+                            import pdb; pdb.set_trace()
                     file_ptr_branch = open(branch_label_path, 'r')
                     branch_content = file_ptr_branch.read().split('\n')[:-1]
                     branch_classes = np.zeros(len(branch_content), dtype='int64')
@@ -596,9 +598,11 @@ class RawFrameStreamSegmentationDatasetMultiLabel(data.IterableDataset):
             precise_sliding_num_list.append(np.expand_dims(sample_segment['precise_sliding_num'], axis=0).copy())
 
         imgs = copy.deepcopy(torch.concat(imgs_list, dim=0))
-        labels = copy.deepcopy(np.concatenate(labels_list, axis=0).astype(np.int64))
-        branch_labels = copy.deepcopy(np.concatenate(branch_labels_list, axis=0).astype(np.int64))
-
+        try:
+            labels = copy.deepcopy(np.concatenate(labels_list, axis=0).astype(np.int64))
+            branch_labels = copy.deepcopy(np.concatenate(branch_labels_list, axis=0).astype(np.int64))
+        except:
+            import pdb; pdb.set_trace()
         masks = copy.deepcopy(np.concatenate(masks_list, axis=0).astype(np.float32))
         precise_sliding_num = copy.deepcopy(np.concatenate(precise_sliding_num_list, axis=0).astype(np.float32))
         # compose result

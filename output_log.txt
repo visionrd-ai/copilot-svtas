@@ -1,0 +1,158 @@
+nohup: ignoring input
+/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/timm/models/layers/__init__.py:48: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/mmcv/cnn/bricks/transformer.py:33: UserWarning: Fail to import ``MultiScaleDeformableAttention`` from ``mmcv.ops.multi_scale_deform_attn``, You should install ``mmcv-full`` if you need this module. 
+  warnings.warn('Fail to import ``MultiScaleDeformableAttention`` from '
+INFO:albumentations.check_version:A new version of Albumentations is available: 2.0.4 (you have 1.4.10). Upgrade using: pip install --upgrade albumentations
+[02/21 11:21:41] [35mCOLLATE[0m : 
+[02/21 11:21:41]     [35mname[0m : [92mStreamBatchCompose[0m
+[02/21 11:21:41]     [35mto_tensor_keys[0m : [92m['imgs', 'labels', 'masks', 'precise_sliding_num'][0m
+[02/21 11:21:41] ------------------------------------------------------------
+[02/21 11:21:41] [35mDATASET[0m : 
+[02/21 11:21:41]     [35mnum_workers[0m : [92m0[0m
+[02/21 11:21:41]     [35mtemporal_clip_batch_size[0m : [92m3[0m
+[02/21 11:21:41]     [35mtest[0m : 
+[02/21 11:21:41]         [35mactions_map_file_path[0m : [92m./data/thal/mapping_tasks.txt[0m
+[02/21 11:21:41]         [35mbranches_map_file_path[0m : [92m./data/thal/mapping_branches.txt[0m
+[02/21 11:21:41]         [35mclip_seg_num[0m : [92m16[0m
+[02/21 11:21:41]         [35mdata_prefix[0m : [92m./[0m
+[02/21 11:21:41]         [35mdataset_type[0m : [92mgtea[0m
+[02/21 11:21:41]         [35mfile_path[0m : [92m./data/thal/splits/test.split1.bundle[0m
+[02/21 11:21:41]         [35mgt_path[0m : [92m./data/thal/groundTruth_split[0m
+[02/21 11:21:41]         [35mname[0m : [92mRawFrameStreamSegmentationDatasetMultiLabel[0m
+[02/21 11:21:41]         [35msample_rate[0m : [92m2[0m
+[02/21 11:21:41]         [35msliding_window[0m : [92m32[0m
+[02/21 11:21:41]         [35mtrain_mode[0m : [92mFalse[0m
+[02/21 11:21:41]         [35mvideos_path[0m : [92m./data/thal/Videos[0m
+[02/21 11:21:41]     [35mtrain[0m : 
+[02/21 11:21:41]         [35mactions_map_file_path[0m : [92m./data/thal/mapping_tasks.txt[0m
+[02/21 11:21:41]         [35mbranches_map_file_path[0m : [92m./data/thal/mapping_branches.txt[0m
+[02/21 11:21:41]         [35mclip_seg_num[0m : [92m16[0m
+[02/21 11:21:41]         [35mdata_prefix[0m : [92m./[0m
+[02/21 11:21:41]         [35mdataset_type[0m : [92mgtea[0m
+[02/21 11:21:41]         [35mfile_path[0m : [92m./data/thal/splits/train.split1.bundle[0m
+[02/21 11:21:41]         [35mgt_path[0m : [92m./data/thal/groundTruth_split[0m
+[02/21 11:21:41]         [35mname[0m : [92mRawFrameStreamSegmentationDatasetMultiLabel[0m
+[02/21 11:21:41]         [35msample_rate[0m : [92m2[0m
+[02/21 11:21:41]         [35msliding_window[0m : [92m32[0m
+[02/21 11:21:41]         [35mtrain_mode[0m : [92mTrue[0m
+[02/21 11:21:41]         [35mvideos_path[0m : [92m./data/thal/Videos[0m
+[02/21 11:21:41]     [35mvideo_batch_size[0m : [92m8[0m
+[02/21 11:21:41] ------------------------------------------------------------
+[02/21 11:21:41] [35mLRSCHEDULER[0m : 
+[02/21 11:21:41]     [35mgamma[0m : [92m0.1[0m
+[02/21 11:21:41]     [35mname[0m : [92mMultiStepLR[0m
+[02/21 11:21:41]     [35mstep_size[0m : [92m[50][0m
+[02/21 11:21:41] ------------------------------------------------------------
+[02/21 11:21:41] [35mMETRIC[0m : 
+[02/21 11:21:41]     [35mactions_map_file_path[0m : [92m./data/thal/mapping_split.txt[0m
+[02/21 11:21:41]     [35mfile_output[0m : [92mTrue[0m
+[02/21 11:21:41]     [35mname[0m : [92mTASegmentationMetric[0m
+[02/21 11:21:41]     [35moverlap[0m : [92m[0.1, 0.25, 0.5][0m
+[02/21 11:21:41]     [35mscore_output[0m : [92mTrue[0m
+[02/21 11:21:41] ------------------------------------------------------------
+[02/21 11:21:41] [35mMODEL[0m : 
+[02/21 11:21:41]     [35marchitecture[0m : [92mStreamSegmentation2DMultiLabel[0m
+[02/21 11:21:41]     [35mbackbone[0m : 
+[02/21 11:21:41]         [35mclip_seg_num[0m : [92m16[0m
+[02/21 11:21:41]         [35mname[0m : [92mResNetTSM[0m
+[02/21 11:21:41]         [35mout_indices[0m : [92m(3,)[0m
+[02/21 11:21:41]         [35mpretrained[0m : [92mdata/clsLess_tsm_r50_256p_1x1x8_kinetics400_rgb_.pth[0m
+[02/21 11:21:41]         [35mshift_div[0m : [92m8[0m
+[02/21 11:21:41]     [35mhead[0m : 
+[02/21 11:21:41]         [35maction_head[0m : 
+[02/21 11:21:41]             [35mdim[0m : [92m2048[0m
+[02/21 11:21:41]             [35mname[0m : [92mMemoryTCNHead[0m
+[02/21 11:21:41]             [35mnum_classes[0m : [92m5[0m
+[02/21 11:21:41]             [35mnum_f_maps[0m : [92m64[0m
+[02/21 11:21:41]             [35mnum_layers[0m : [92m4[0m
+[02/21 11:21:41]             [35mnum_stages[0m : [92m1[0m
+[02/21 11:21:41]             [35msample_rate[0m : [92m2[0m
+[02/21 11:21:41]         [35mbranch_head[0m : 
+[02/21 11:21:41]             [35mdim[0m : [92m2048[0m
+[02/21 11:21:41]             [35mname[0m : [92mMemoryTCNHead[0m
+[02/21 11:21:41]             [35mnum_classes[0m : [92m16[0m
+[02/21 11:21:41]             [35mnum_f_maps[0m : [92m64[0m
+[02/21 11:21:41]             [35mnum_layers[0m : [92m4[0m
+[02/21 11:21:41]             [35mnum_stages[0m : [92m1[0m
+[02/21 11:21:41]             [35msample_rate[0m : [92m2[0m
+[02/21 11:21:41]         [35msample_rate[0m : [92m2[0m
+[02/21 11:21:41]     [35mloss[0m : 
+[02/21 11:21:41]         [35mignore_index[0m : [92m-100[0m
+[02/21 11:21:41]         [35mname[0m : [92mSegmentationLossMultiLabel[0m
+[02/21 11:21:41]         [35mnum_classes_action[0m : [92m5[0m
+[02/21 11:21:41]         [35mnum_classes_branches[0m : [92m16[0m
+[02/21 11:21:41]         [35msample_rate[0m : [92m2[0m
+[02/21 11:21:41]         [35msmooth_weight[0m : [92m0.15[0m
+[02/21 11:21:41]     [35mneck[0m : 
+[02/21 11:21:41]         [35mclip_seg_num[0m : [92m16[0m
+[02/21 11:21:41]         [35mdrop_ratio[0m : [92m0.5[0m
+[02/21 11:21:41]         [35min_channels[0m : [92m2048[0m
+[02/21 11:21:41]         [35mname[0m : [92mAvgPoolNeck[0m
+[02/21 11:21:41]         [35mneed_pool[0m : [92mTrue[0m
+[02/21 11:21:41]         [35mnum_classes[0m : [92m21[0m
+[02/21 11:21:41] ------------------------------------------------------------
+[02/21 11:21:41] [35mOPTIMIZER[0m : 
+[02/21 11:21:41]     [35mbetas[0m : [92m(0.9, 0.999)[0m
+[02/21 11:21:41]     [35mlearning_rate[0m : [92m0.0005[0m
+[02/21 11:21:41]     [35mname[0m : [92mTSMAdamOptimizer[0m
+[02/21 11:21:41]     [35mweight_decay[0m : [92m0.0001[0m
+[02/21 11:21:41] ------------------------------------------------------------
+[02/21 11:21:41] [35mPIPELINE[0m : 
+[02/21 11:21:41]     [35mtest[0m : 
+[02/21 11:21:41]         [35mdecode[0m : 
+[02/21 11:21:41]             [35mbackend[0m : [92mdecord[0m
+[02/21 11:21:41]             [35mname[0m : [92mVideoDecoder[0m
+[02/21 11:21:41]         [35mname[0m : [92mBasePipline[0m
+[02/21 11:21:41]         [35msample[0m : 
+[02/21 11:21:41]             [35mclip_seg_num[0m : [92m16[0m
+[02/21 11:21:41]             [35mis_train[0m : [92mFalse[0m
+[02/21 11:21:41]             [35mname[0m : [92mVideoStreamSamplerMultiLabel[0m
+[02/21 11:21:41]             [35msample_mode[0m : [92mrandom_choice[0m
+[02/21 11:21:41]             [35msample_rate[0m : [92m2[0m
+[02/21 11:21:41]             [35msliding_window[0m : [92m32[0m
+[02/21 11:21:41]         [35mtransform[0m : 
+[02/21 11:21:41]             [35mname[0m : [92mVideoStreamTransform[0m
+[02/21 11:21:41]             [35mtransform_list[0m : 
+[02/21 11:21:41]                 [35mResize[0m : 
+[02/21 11:21:41]                     [35msize[0m : [92m[224, 224][0m
+[02/21 11:21:41]                 [35mToTensor[0m : [92mNone[0m
+[02/21 11:21:41]                 [35mNormalize[0m : 
+[02/21 11:21:41]                     [35mmean[0m : [92m[0.485, 0.456, 0.406][0m
+[02/21 11:21:41]                     [35mstd[0m : [92m[0.229, 0.224, 0.225][0m
+[02/21 11:21:41]     [35mtrain[0m : 
+[02/21 11:21:41]         [35mdecode[0m : 
+[02/21 11:21:41]             [35mbackend[0m : [92mdecord[0m
+[02/21 11:21:41]             [35mname[0m : [92mVideoDecoder[0m
+[02/21 11:21:41]         [35mname[0m : [92mBasePipline[0m
+[02/21 11:21:41]         [35msample[0m : 
+[02/21 11:21:41]             [35mclip_seg_num[0m : [92m16[0m
+[02/21 11:21:41]             [35mis_train[0m : [92mTrue[0m
+[02/21 11:21:41]             [35mname[0m : [92mVideoStreamSamplerMultiLabel[0m
+[02/21 11:21:41]             [35msample_mode[0m : [92mrandom_choice[0m
+[02/21 11:21:41]             [35msample_rate[0m : [92m2[0m
+[02/21 11:21:41]             [35msliding_window[0m : [92m32[0m
+[02/21 11:21:41]         [35mtransform[0m : 
+[02/21 11:21:41]             [35mname[0m : [92mVideoStreamTransform[0m
+[02/21 11:21:41]             [35mtransform_list[0m : 
+[02/21 11:21:41]                 [35mResize[0m : 
+[02/21 11:21:41]                     [35msize[0m : [92m[224, 224][0m
+[02/21 11:21:41]                 [35mRandomHorizontalFlip[0m : [92mNone[0m
+[02/21 11:21:41]                 [35mToTensor[0m : [92mNone[0m
+[02/21 11:21:41]                 [35mNormalize[0m : 
+[02/21 11:21:41]                     [35mmean[0m : [92m[0.485, 0.456, 0.406][0m
+[02/21 11:21:41]                     [35mstd[0m : [92m[0.229, 0.224, 0.225][0m
+[02/21 11:21:41] ------------------------------------------------------------
+[02/21 11:21:41] [35mPOSTPRECESSING[0m : 
+[02/21 11:21:41]     [35mclip_seg_num[0m : [92m16[0m
+[02/21 11:21:41]     [35mignore_index[0m : [92m-100[0m
+[02/21 11:21:41]     [35mname[0m : [92mStreamScorePostProcessingMultiLabel[0m
+[02/21 11:21:41]     [35mnum_action_classes[0m : [92m5[0m
+[02/21 11:21:41]     [35mnum_branch_classes[0m : [92m16[0m
+[02/21 11:21:41]     [35msample_rate[0m : [92m2[0m
+[02/21 11:21:41]     [35msliding_window[0m : [92m32[0m
+[02/21 11:21:41] ------------------------------------------------------------
+[02/21 11:21:41] [35mepochs[0m : [92m200[0m
+[02/21 11:21:41] [35mlog_interval[0m : [92m1[0m
+[02/21 11:21:41] [35mmodel_name[0m : [92mThal_BranchAction_2xMemoryTCN_16C2S_randomSample_hardAug[0m
+[02/21 11:21:41] [35msave_interval[0m : [92m50[0m
