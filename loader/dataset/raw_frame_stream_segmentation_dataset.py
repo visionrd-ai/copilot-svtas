@@ -166,7 +166,6 @@ class RawFrameStreamSegmentationDataset(data.IterableDataset):
                     if self.dataset_type in ['gtea', '50salads', 'thumos14', 'egtea']:
                         video_name = video_segment.split('.')[0]
                         label_path = os.path.join(self.gt_path, video_name + '.txt')
-                        import pdb; pdb.set_trace()
                         video_path = os.path.join(self.videos_path, video_name + '.mp4')
                         if not osp.isfile(video_path):
 
@@ -549,8 +548,10 @@ class RawFrameStreamSegmentationDatasetMultiLabel(data.IterableDataset):
                         ### for GTEA ###
                         # classes[i] = self.actions_dict[content[i]]
                         ### for THAL ###
-                        branch_classes[i] = self.branches_dict[branch_content[i].split(':')[-1].strip()]
-                    
+                        try:
+                            branch_classes[i] = self.branches_dict[branch_content[i].split(':')[-1].strip()]
+                        except:
+                            import pdb; pdb.set_trace()
                     # caculate sliding num
                     if max_len < len(content):
                         max_len = len(content)

@@ -106,6 +106,7 @@ class Runner():
         
         
     def batch_end_step(self, sliding_num, vid_list, step, epoch):
+
         if self.runner_mode in ['train']:
             # for name, param in self.model.named_parameters():
             #     self.writer.add_histogram(name, param.clone().cpu().data.numpy(), self.step)
@@ -183,11 +184,16 @@ class Runner():
                     vid = vid_i
 
             return outputs, ground_truth_list, vid
+        import pdb; pdb.set_trace()
 
         out = self.post_processing.output()
         outputs, ground_truth_list, vid = process_post_output(out[0], self.runner_mode, self.nprocs, self.current_step_vid_list)
+        if not vid: 
+            import pdb; pdb.set_trace()
         f1_action, acc_action = self.Metric.update(vid, ground_truth_list, outputs, action_dict_path='data/thal/mapping_tasks.txt')
         outputs, ground_truth_list, vid = process_post_output(out[1], self.runner_mode, self.nprocs, self.current_step_vid_list)
+        if not vid: 
+            import pdb; pdb.set_trace()
         f1_branch, acc_branch = self.Metric.update(vid, ground_truth_list, outputs, action_dict_path='data/thal/mapping_branches.txt')
 
 
@@ -317,7 +323,7 @@ class Runner():
             sliding_num = sliding_seg['sliding_num']
             idx = sliding_seg['current_sliding_cnt']
             # wheather next step
-
+            
             if self.current_step != step or (len(vid_list) <= 0 and step == 1):
                 self.batch_end_step(sliding_num=sliding_num, vid_list=vid_list, step=step, epoch=epoch)
 

@@ -53,8 +53,8 @@ COLLATE:
     to_tensor_keys: ["imgs", "labels", "masks", "precise_sliding_num"]
 
 DATASET: #DATASET field
-    temporal_clip_batch_size: 3
-    video_batch_size: 8
+    temporal_clip_batch_size: 4
+    video_batch_size: 16
     num_workers: 0
     train:
         name: "RawFrameStreamSegmentationDatasetMultiLabel"
@@ -152,7 +152,7 @@ METRIC:
     score_output: True
 
 
-model_name: "Thal_Arducam_Scratch"
+model_name: "Thal_amur_data"
 log_interval: 1 #Optional, the interal of logger, default:10
 epochs: 200 #Mandatory, total epoch
 save_interval: 50
