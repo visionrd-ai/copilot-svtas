@@ -36,5 +36,5 @@ def split_mapping(mapping_file, output_branches, output_actions):
 # Example usage
 mapping_file = "data/production/mapping.txt"  # Change this to your mapping file path
 output_branches = "data/production/mapping_branches.txt"
-output_actions = "data/production/mapping_actions.txt"
+output_actions = "data/production/mapping_tasks.txt"
 split_mapping(mapping_file, output_branches, output_actions)

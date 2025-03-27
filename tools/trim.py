@@ -2,9 +2,9 @@ import os
 import subprocess
 
 # Input paths
-video_dir = 'data/thal/Videos'  
-label_dir = 'data/thal/groundTruth' 
-output_dir = 'data/thal/'
+video_dir = 'data/production/Videos'  
+label_dir = 'data/production/groundTruth' 
+output_dir = 'data/production/'
 os.makedirs(output_dir, exist_ok=True)
 
 # Iterate over all videos in the video directory
