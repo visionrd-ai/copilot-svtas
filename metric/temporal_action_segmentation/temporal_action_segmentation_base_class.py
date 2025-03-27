@@ -59,6 +59,7 @@ class BaseTASegmentationMetric(BaseMetric):
         actions = file_ptr.read().split('\n')[:-1]
         file_ptr.close()
         self.actions_dict = dict()
+        import pdb; pdb.set_trace()
         for a in actions:
             self.actions_dict[a.split()[1]] = int(a.split()[0])
         # cls score

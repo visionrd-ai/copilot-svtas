@@ -8,7 +8,7 @@ MODEL:
         out_indices: (3, )
     neck:
         name: "AvgPoolNeck"
-        num_classes: 20
+        num_classes: 37
         in_channels: 2048
         clip_seg_num: 16
         drop_ratio: 0.5
@@ -20,7 +20,7 @@ MODEL:
             num_layers: 4
             num_f_maps: 64
             dim: 2048
-            num_classes: 5
+            num_classes: 10
             sample_rate: 2
         branch_head:
             name: "MemoryTCNHead"
@@ -28,21 +28,21 @@ MODEL:
             num_layers: 4
             num_f_maps: 64
             dim: 2048
-            num_classes: 15
+            num_classes: 27
             sample_rate: 2
         sample_rate: 2
     loss:
         name: "SegmentationLossMultiLabel"
-        num_classes_action: 5
-        num_classes_branches: 15
+        num_classes_action: 10
+        num_classes_branches: 27
         sample_rate: 2
         smooth_weight: 0.15
         ignore_index: -100
 
 POSTPRECESSING:
     name: "StreamScorePostProcessingMultiLabel"
-    num_action_classes: 5
-    num_branch_classes: 15
+    num_action_classes: 10
+    num_branch_classes: 27
     clip_seg_num: 16
     sliding_window: 32
     sample_rate: 2
