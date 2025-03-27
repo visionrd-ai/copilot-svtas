@@ -67,10 +67,7 @@ class TASegmentationMetric(BaseTASegmentationMetric):
             if self.score_output is True and self.train_mode is False:
                 score_output_path = os.path.join(self.score_output_dir, vid[bs] + ".npy")
                 np.save(score_output_path, output_np)
-            try:
-                result = self._transform_model_result(vid[bs], outputs_np, gt_np, outputs_arr, action_dict)
-            except:
-                import pdb; pdb.set_trace()
+            result = self._transform_model_result(vid[bs], outputs_np, gt_np, outputs_arr, action_dict)
             recog_content, gt_content, pred_detection, gt_detection = result
             single_f1, acc = self._update_score([vid[bs]], recog_content, gt_content, pred_detection,
                             gt_detection)

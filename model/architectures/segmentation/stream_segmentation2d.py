@@ -222,6 +222,7 @@ class StreamSegmentation2DMultiLabel(nn.Module):
             self.action_head._clear_memory_buffer()
         if self.branch_head is not None:
             self.branch_head._clear_memory_buffer()
+            
     def feature_fusion(self, temporal_fet, spatial_feat):
 
         x_1 = temporal_fet

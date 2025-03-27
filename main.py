@@ -70,13 +70,20 @@ def parse_args():
         default='none',
         help='job launcher')
     args = parser.parse_args()
-    if 'LOCAL_RANK' not in os.environ:
-        os.environ['LOCAL_RANK'] = str(args.local_rank)
-    return args
+    # if 'LOCAL_RANK' not in os.environ:
+    #     os.environ['LOCAL_RANK'] = str(args.local_rank)
+    # else:
+    if args.launcher == 'pytorch':
+        local_rank = int(os.environ["LOCAL_RANK"])
+        torch.cuda.set_device(local_rank)
+    else:
+       local_rank = -1
+       os.environ['LOCAL_RANK'] = str(local_rank)
+    return args, local_rank
 
 
 def main():
-    args = parse_args()
+    args, local_rank = parse_args()
     cfg = get_config(args.config, overrides=args.override, tensorboard=args.use_tensorboard)
 
     # init distributed env first, since logger depends on the dist info.
@@ -99,18 +106,18 @@ def main():
         # weather accelerate conv op
         torch.backends.cudnn.benchmark = False
 
-
+    print(local_rank)
     if args.test:
         test(cfg,
              args=args,
-             local_rank=args.local_rank,
+             local_rank=local_rank,
              nprocs=nprocs,
              use_amp=args.use_amp,
              weights=args.weights)
     else:
         train(cfg,
             args=args,
-            local_rank=args.local_rank,
+            local_rank=local_rank,
             nprocs=nprocs,
             use_amp=args.use_amp,
             weights=args.weights,

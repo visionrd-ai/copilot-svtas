@@ -72,10 +72,10 @@ class VideoStreamSampler():
         self.channel_mode = channel_mode
         self.sample = VideoFrameSample(mode = sample_mode)
         self.transform = A.ReplayCompose([
-                    A.RandomBrightnessContrast(p=0.6),
-                    A.HueSaturationValue(hue_shift_limit=(-10, 10), sat_shift_limit=(-10, 10), val_shift_limit=(-10, 10), p=1),
-                    A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.01, rotate_limit=4, p=1),
-                    A.ImageCompression(quality_lower=75, quality_upper=95, p=1),
+                    A.RandomBrightnessContrast(p=0.3),
+                    A.HueSaturationValue(hue_shift_limit=(-10, 10), sat_shift_limit=(-10, 10), val_shift_limit=(-10, 10), p=0.3),
+                    A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.01, rotate_limit=4, p=0.3),
+                    A.ImageCompression(quality_lower=75, quality_upper=95, p=0.3),
                 ])
     def _all_valid_frames(self, start_frame, end_frame, video_len, container, labels):
         imgs = []
@@ -211,10 +211,10 @@ class VideoStreamSamplerMultiLabel():
         self.channel_mode = channel_mode
         self.sample = VideoFrameSample(mode = sample_mode)
         self.transform = A.ReplayCompose([
-                    A.RandomBrightnessContrast(p=0.6),
-                    A.HueSaturationValue(hue_shift_limit=(-30, 30), sat_shift_limit=(-30, 30), val_shift_limit=(-30, 30), p=0.6),
-                    A.ShiftScaleRotate(shift_limit=0.25, scale_limit=0.4, rotate_limit=15, p=0.6),
-                    A.ImageCompression(quality_lower=75, quality_upper=95, p=0.6),
+                    A.RandomBrightnessContrast(p=0.3),
+                    A.HueSaturationValue(hue_shift_limit=(-30, 30), sat_shift_limit=(-30, 30), val_shift_limit=(-30, 30), p=0.3),
+                    A.ShiftScaleRotate(shift_limit=0.25, scale_limit=0.4, rotate_limit=15, p=0.3),
+                    A.ImageCompression(quality_lower=75, quality_upper=95, p=0.3),
                 ])
         self.visualize = False
         

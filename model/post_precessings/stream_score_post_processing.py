@@ -140,7 +140,7 @@ class StreamScorePostProcessingMultiLabel():
         branch_pred_score_list = []
         branch_pred_cls_list = []
         branch_ground_truth_list = []
-
+        
         for bs in range(self.pred_action_scores.shape[0]):
             # Action outputs
             action_index = np.where(self.video_action_gt[bs, :] == self.ignore_index)

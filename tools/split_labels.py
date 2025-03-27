@@ -42,8 +42,8 @@ def process_label_files(input_folder, output_folder):
     print(f"Processing complete. Output files saved in {output_folder}")
 
 # Specify the input and output folder paths
-input_folder = "data/thal/TEST_TRIMMED/groundTruth"
-output_folder = "data/thal/TEST_TRIMMED/groundTruth_split"
+input_folder = "data/thal/groundTruth"
+output_folder = "data/thal/groundTruth_split"
 
 # Process the files
 process_label_files(input_folder, output_folder)

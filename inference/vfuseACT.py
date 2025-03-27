@@ -128,17 +128,17 @@ class vfuseACT_multihead(nn.Module):
         # import pdb; pdb.set_trace()
         self.backbone = ResNetTSM(
             depth=50, 
-            pretrained="../clsLess_tsm_r50_256p_1x1x8_kinetics400_rgb_.pth" ,
+            pretrained="../data/clsLess_tsm_r50_256p_1x1x8_kinetics400_rgb_.pth" ,
             clip_seg_num=clip_seg_num, 
             shift_div= 8, 
             out_indices= (3, ))
         
         self.det_backbone =  ResNet(
             depth=50, 
-            pretrained='../new_cleaned.pth')
+            pretrained='../data/new_cleaned.pth')
        
         self.neck = AvgPoolNeck(
-            num_classes= 21, 
+            num_classes= 20, 
             in_channels= 2048, 
             clip_seg_num= clip_seg_num, 
             drop_ratio= 0.5 ,
@@ -157,7 +157,7 @@ class vfuseACT_multihead(nn.Module):
             num_layers= 4, 
             num_f_maps= 64 ,
             dim= 2048, 
-            num_classes= 16 ,
+            num_classes= 15 ,
             sample_rate= sample_rate)
         
         self.feat_combine = torch.nn.Sequential(
@@ -170,8 +170,8 @@ class vfuseACT_multihead(nn.Module):
         )
 
         self.sample_rate = self.action_head.sample_rate
-        self.det_weights = torch.load('../new_cleaned.pth')
-        self.det_backbone =  ResNet(depth=50, pretrained='../new_cleaned.pth')
+        self.det_weights = torch.load('../data/new_cleaned.pth')
+        self.det_backbone =  ResNet(depth=50, pretrained='../data/new_cleaned.pth')
         self.init_weights()
 
     def init_weights(self):

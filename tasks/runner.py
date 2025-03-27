@@ -46,12 +46,19 @@ class Runner():
         self.Metric = Metric
         self.record_dict = record_dict
         self.cfg = cfg
-        self.model = model
+        # self.model = model
         self.criterion = criterion
         self.post_processing = post_processing
         self.nprocs = nprocs
         self.local_rank = local_rank
         self.use_amp = use_amp
+                
+
+        if self.nprocs > 1:
+           
+            self.model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[local_rank], output_device=local_rank)
+        else:
+            self.model = model
 
         # self.writer = get_logger(name="SVTAS", tensorboard=True)
         # self.step = 1
@@ -106,7 +113,12 @@ class Runner():
         
         
     def batch_end_step(self, sliding_num, vid_list, step, epoch):
-
+        if not vid_list:  # Handle empty vid_list early
+            self.current_step_vid_list = []
+            self._init_loss_dict()  # Reset loss tracking
+            self.b_tic = time.time()
+            self.current_step = step
+            return  # Exit early
         if self.runner_mode in ['train']:
             # for name, param in self.model.named_parameters():
             #     self.writer.add_histogram(name, param.clone().cpu().data.numpy(), self.step)
@@ -118,7 +130,9 @@ class Runner():
 
         # clear memory buffer
         if self.nprocs > 1:
-            self.model.module._clear_memory_buffer()
+            if hasattr(self.model, "module") and hasattr(self.model.module, "_clear_memory_buffer"):
+                self.model.module._clear_memory_buffer()
+
         else:
             self.model._clear_memory_buffer()
 
@@ -146,45 +160,36 @@ class Runner():
                 output_np=pred_score_list
             )
             vid = current_step_vid_list
-
-            # Handle distributed gathering if in validation or test mode
-            if runner_mode in ['validation', 'test']:
-                if nprocs > 1:
-                    # Prepare collect_dict for distributed gathering
+            if self.runner_mode in ['validation', 'test']:
+                if self.nprocs > 1:
                     collect_dict = dict(
                         predict=pred_cls_list,
                         output_np=pred_score_list,
                         ground_truth=ground_truth_list,
-                        vid=current_step_vid_list
+                        vid=self.current_step_vid_list
                     )
-                    gather_objects = [collect_dict for _ in range(nprocs)]  # Prepare objects to gather
-                    output_list = [None for _ in range(nprocs)]
-
-                    # Perform distributed all_gather_object
+                    gather_objects = [collect_dict for _ in range(self.nprocs)] # any picklable object
+                    output_list = [None for _ in range(self.nprocs)]
                     dist.all_gather_object(output_list, gather_objects[dist.get_rank()])
-
-                    # Collect gathered data from all processes
+                    # collect
                     pred_cls_list_i = []
                     pred_score_list_i = []
                     ground_truth_list_i = []
                     vid_i = []
-
+                    
                     for output_dict in output_list:
-                        pred_cls_list_i += output_dict["predict"]
-                        pred_score_list_i += output_dict["output_np"]
-                        ground_truth_list_i += output_dict["ground_truth"]
-                        vid_i += output_dict["vid"]
-
-                    # Update outputs and ground_truth_list with gathered data
-                    outputs = dict(
-                        predict=pred_cls_list_i,
-                        output_np=pred_score_list_i
-                    )
+                        pred_cls_list_i = pred_cls_list_i + output_dict["predict"]
+                        pred_score_list_i = pred_score_list_i + output_dict["output_np"]
+                        ground_truth_list_i = ground_truth_list_i + output_dict["ground_truth"]
+                        # print(f"output_dict: {output_dict}")  # Debugging print statement
+                        vid_i = vid_i + output_dict["vid"]
+                    outputs = dict(predict=pred_cls_list_i,
+                                    output_np=pred_score_list_i)
                     ground_truth_list = ground_truth_list_i
                     vid = vid_i
 
             return outputs, ground_truth_list, vid
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
 
         out = self.post_processing.output()
         outputs, ground_truth_list, vid = process_post_output(out[0], self.runner_mode, self.nprocs, self.current_step_vid_list)
@@ -288,7 +293,7 @@ class Runner():
         #     out.write(norm)
 
         # out.release()
-        if self.nprocs > 1 and idx < sliding_num - 1 and self.use_amp is False:
+        if self.nprocs > 1 and idx < sliding_num - 1 and self.use_amp is False and isinstance(self.model, torch.nn.parallel.DistributedDataParallel):
             with self.model.no_sync():
                 # multi-gpus
                 score, loss_dict = self._model_forward(data_dict)
@@ -296,12 +301,19 @@ class Runner():
             # single gpu
             score, loss_dict = self._model_forward(data_dict)
 
+        # if self.nprocs > 1 and idx < sliding_num - 1 and self.use_amp is False and isinstance(self.model, torch.nn.parallel.DistributedDataParallel):
+        #     with self.model.no_sync():
+        #         score, loss_dict = self._model_forward(data_dict)
+        # else:
+        #     score, loss_dict = self._model_forward(data_dict)
+
         # score = score.unsqueeze(0)
         # score = torch.nn.functional.interpolate(
         #     input=score,
         #     scale_factor=[1, 4],
         #     mode="nearest")
         with torch.no_grad():
+            # print("i am here")
             if self.post_processing.init_flag is not True:
                 self.post_processing.init_scores(sliding_num, len(vid_list))
                 self.current_step_vid_list = vid_list
@@ -323,10 +335,15 @@ class Runner():
             sliding_num = sliding_seg['sliding_num']
             idx = sliding_seg['current_sliding_cnt']
             # wheather next step
+            # print("Video list length ", len(vid_list))
+            # print("step ", step)
+            # print("current step ", self.current_step)
+
+            # print("at batch end: ", self.current_step != step or (len(vid_list) <= 0 and step == 1))
+            # print("idx: ", idx >= 0)
             
             if self.current_step != step or (len(vid_list) <= 0 and step == 1):
                 self.batch_end_step(sliding_num=sliding_num, vid_list=vid_list, step=step, epoch=epoch)
-
             if idx >= 0: 
                 self.run_one_clip(sliding_seg)
     

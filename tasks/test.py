@@ -177,73 +177,73 @@ def test(cfg,
         # tensorboard_writer.add_graph(model, input_to_model=[x, mask, torch.ones(1).cuda()])
 
         # mmcv caculate param and flops
-        logger.info("="*20)
-        logger.info('Use mmcv get_model_complexity_info function')
-        flops_number, params_number = get_model_complexity_info(model, input_shape=input_shape, input_constructor=input_constructor, print_per_layer_stat=False, as_strings=False)
-        flops_per_image_number = flops_number / cfg.DATASET.test.clip_seg_num
-        flops, params = clever_format([flops_number, params_number], "%.6f")
-        flops_per_image, params = clever_format([flops_per_image_number, params_number], "%.6f")
-        logger.info("Hitp: This FLOPs is caculation by {clip_seg_num:d} imgs".format(clip_seg_num=cfg.DATASET.test.clip_seg_num))
-        logger.info("Per Image FLOPs:"+ flops_per_image + ", Total FLOPs:" + flops + ", Total params:" + params)
-        logger.info("="*20)
+        # logger.info("="*20)
+        # logger.info('Use mmcv get_model_complexity_info function')
+        # flops_number, params_number = get_model_complexity_info(model, input_shape=input_shape, input_constructor=input_constructor, print_per_layer_stat=False, as_strings=False)
+        # flops_per_image_number = flops_number / cfg.DATASET.test.clip_seg_num
+        # flops, params = clever_format([flops_number, params_number], "%.6f")
+        # flops_per_image, params = clever_format([flops_per_image_number, params_number], "%.6f")
+        # logger.info("Hitp: This FLOPs is caculation by {clip_seg_num:d} imgs".format(clip_seg_num=cfg.DATASET.test.clip_seg_num))
+        # logger.info("Per Image FLOPs:"+ flops_per_image + ", Total FLOPs:" + flops + ", Total params:" + params)
+        # logger.info("="*20)
 
         # fvcore caculate param and flops
-        logger.info('Use fvcore FlopCountAnalysis function')
-        inputs = (dummy_input['input_data'])
-        flops = FlopCountAnalysis(model, inputs)
-        logger.info("flop_count_table: \n" + flop_count_table(flops))
-        flops_number = flops.total()
-        flops_per_image_number = flops_number / cfg.DATASET.test.clip_seg_num
-        flops = clever_format([flops_number], "%.6f")
-        flops_per_image = clever_format([flops_per_image_number], "%.6f")
-        logger.info("Hitp: This FLOPs is caculation by {clip_seg_num:d} imgs".format(clip_seg_num=cfg.DATASET.test.clip_seg_num))
-        logger.info("Per Image FLOPs:"+ flops_per_image + ", Total FLOPs:" + flops)
-        logger.info("="*20)
+        # logger.info('Use fvcore FlopCountAnalysis function')
+        # inputs = (dummy_input['input_data'])
+        # flops = FlopCountAnalysis(model, inputs)
+        # logger.info("flop_count_table: \n" + flop_count_table(flops))
+        # flops_number = flops.total()
+        # flops_per_image_number = flops_number / cfg.DATASET.test.clip_seg_num
+        # flops = clever_format([flops_number], "%.6f")
+        # flops_per_image = clever_format([flops_per_image_number], "%.6f")
+        # logger.info("Hitp: This FLOPs is caculation by {clip_seg_num:d} imgs".format(clip_seg_num=cfg.DATASET.test.clip_seg_num))
+        # logger.info("Per Image FLOPs:"+ flops_per_image + ", Total FLOPs:" + flops)
+        # logger.info("="*20)
 
         # model fps caculate
-        dummy_input = dummy_input['input_data']
-        logger.info('Caculate model fps (single frame infer times)')
-        starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
-        repetitions = 300
-        timings = np.zeros((repetitions, 1))
+        # dummy_input = dummy_input['input_data']
+        # logger.info('Caculate model fps (single frame infer times)')
+        # starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
+        # repetitions = 300
+        # timings = np.zeros((repetitions, 1))
 
-        #GPU-WARM-UP
-        for _ in range(10):
-            _ = model(dummy_input)
+        # #GPU-WARM-UP
+        # for _ in range(10):
+        #     _ = model(dummy_input)
 
-        # MEASURE PERFORMANCE
-        with torch.no_grad():
-            for rep in range(repetitions):
-                starter.record()
-                _ = model(dummy_input)
-                ender.record()
-                # WAIT FOR GPU SYNC
-                torch.cuda.synchronize()
-                curr_time = starter.elapsed_time(ender)
-                timings[rep] = curr_time
-        mean_syn = np.sum(timings) / repetitions
-        std_syn = np.std(timings)
-        mean_fps = 1000. / mean_syn * cfg.DATASET.test.clip_seg_num
-        logger.info('Mean@1 {mean_syn:.3f}ms, Std@5 {std_syn:.3f}ms, FPS@1 {mean_fps:.2f}'.format(mean_syn=mean_syn, std_syn=std_syn, mean_fps=mean_fps))
-        logger.info('Model single forward infer time(ms) {mean_syn:.3f}ms'.format(mean_syn=mean_syn))
-        logger.info("="*20)
+        # # MEASURE PERFORMANCE
+        # with torch.no_grad():
+        #     for rep in range(repetitions):
+        #         starter.record()
+        #         _ = model(dummy_input)
+        #         ender.record()
+        #         # WAIT FOR GPU SYNC
+        #         torch.cuda.synchronize()
+        #         curr_time = starter.elapsed_time(ender)
+        #         timings[rep] = curr_time
+        # mean_syn = np.sum(timings) / repetitions
+        # std_syn = np.std(timings)
+        # mean_fps = 1000. / mean_syn * cfg.DATASET.test.clip_seg_num
+        # logger.info('Mean@1 {mean_syn:.3f}ms, Std@5 {std_syn:.3f}ms, FPS@1 {mean_fps:.2f}'.format(mean_syn=mean_syn, std_syn=std_syn, mean_fps=mean_fps))
+        # logger.info('Model single forward infer time(ms) {mean_syn:.3f}ms'.format(mean_syn=mean_syn))
+        # logger.info("="*20)
 
-        # model latency time
-        logger.info('Caculate model Throughput')
-        repetitions=100
-        total_time = 0
-        # it should be modify by every model
-        optimal_batch_size=1
-        dummy_input = input_constructor(input_shape, optimal_batch_size=optimal_batch_size)['input_data']
-        with torch.no_grad():
-            for rep in range(repetitions):
-                starter, ender = torch.cuda.Event(enable_timing=True),torch.cuda.Event(enable_timing=True)
-                starter.record()
-                _ = model(dummy_input)
-                ender.record()
-                torch.cuda.synchronize()
-                curr_time = starter.elapsed_time(ender) / 1000
-                total_time += curr_time
-        Throughput = (repetitions * optimal_batch_size) / total_time
-        logger.info("Final Throughput: {Throughput:.2f} V/s, Measuring by batch_size: {Batch_size:d}".format(Throughput=Throughput, Batch_size=optimal_batch_size))
-        logger.info("="*20)
+        # # model latency time
+        # logger.info('Caculate model Throughput')
+        # repetitions=100
+        # total_time = 0
+        # # it should be modify by every model
+        # optimal_batch_size=1
+        # dummy_input = input_constructor(input_shape, optimal_batch_size=optimal_batch_size)['input_data']
+        # with torch.no_grad():
+        #     for rep in range(repetitions):
+        #         starter, ender = torch.cuda.Event(enable_timing=True),torch.cuda.Event(enable_timing=True)
+        #         starter.record()
+        #         _ = model(dummy_input)
+        #         ender.record()
+        #         torch.cuda.synchronize()
+        #         curr_time = starter.elapsed_time(ender) / 1000
+        #         total_time += curr_time
+        # Throughput = (repetitions * optimal_batch_size) / total_time
+        # logger.info("Final Throughput: {Throughput:.2f} V/s, Measuring by batch_size: {Batch_size:d}".format(Throughput=Throughput, Batch_size=optimal_batch_size))
+        # logger.info("="*20)
