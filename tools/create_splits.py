@@ -17,9 +17,9 @@ def split_files_by_prefix(folder_path, prefixes, test_bundle, train_bundle):
     print(f"Train bundle saved to {train_bundle}")
 
 # Example usage
-folder_path = "data/production/groundTruth"  # Change this to your folder path
-prefixes = ["4"]  # Add your prefixes here
-test_bundle = "data/production/splits/test.bundle"
-train_bundle = "data/production/splits/train.bundle"
+folder_path = "data/thal/groundTruth"  # Change this to your folder path
+prefixes = ["8"]  # Add your prefixes here
+test_bundle = "data/thal/splits/test.bundle"
+train_bundle = "data/thal/splits/train.bundle"
 
 split_files_by_prefix(folder_path, prefixes, test_bundle, train_bundle)

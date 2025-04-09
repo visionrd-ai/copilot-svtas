@@ -155,3 +155,58 @@ INFO:albumentations.check_version:A new version of Albumentations is available: 
 [02/21 11:19:10] [35mlog_interval[0m : [92m1[0m
 [02/21 11:19:10] [35mmodel_name[0m : [92mThal_BranchAction_2xMemoryTCN_16C2S_randomSample_hardAug[0m
 [02/21 11:19:10] [35msave_interval[0m : [92m50[0m
+/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/timm/models/layers/__init__.py:48: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/mmcv/cnn/bricks/transformer.py:33: UserWarning: Fail to import ``MultiScaleDeformableAttention`` from ``mmcv.ops.multi_scale_deform_attn``, You should install ``mmcv-full`` if you need this module. 
+  warnings.warn('Fail to import ``MultiScaleDeformableAttention`` from '
+Traceback (most recent call last):
+  File "main.py", line 17, in <module>
+    from tasks.test import test
+  File "/home/multi-gpu/amur/copilot/copilot-svtas/tasks/test.py", line 17, in <module>
+    import loader.builder as dataset_builder
+  File "/home/multi-gpu/amur/copilot/copilot-svtas/loader/__init__.py", line 13, in <module>
+    from .sampler import (VideoStreamSampler, FeatureStreamSampler, RGBFlowVideoStreamSampler,
+  File "/home/multi-gpu/amur/copilot/copilot-svtas/loader/sampler/__init__.py", line 10, in <module>
+    from .frame_sampler import VideoStreamSampler, RGBFlowVideoStreamSampler, VideoFrameSample
+  File "/home/multi-gpu/amur/copilot/copilot-svtas/loader/sampler/frame_sampler.py", line 13, in <module>
+    import albumentations as A
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/albumentations/__init__.py", line 6, in <module>
+    from .augmentations import *
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/albumentations/augmentations/__init__.py", line 1, in <module>
+    from .blur.functional import *
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/albumentations/augmentations/blur/__init__.py", line 1, in <module>
+    from .functional import *
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/albumentations/augmentations/blur/functional.py", line 11, in <module>
+    from albumentations.augmentations.functional import convolve
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/albumentations/augmentations/functional.py", line 31, in <module>
+    import albumentations.augmentations.geometric.functional as fgeometric
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/albumentations/augmentations/geometric/__init__.py", line 1, in <module>
+    from .functional import *
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/albumentations/augmentations/geometric/functional.py", line 8, in <module>
+    import skimage.transform
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/skimage/transform/__init__.py", line 38, in <module>
+    from .radon_transform import (radon, iradon, iradon_sart,
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/skimage/transform/radon_transform.py", line 6, in <module>
+    from ._warps import warp
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/skimage/transform/_warps.py", line 7, in <module>
+    from ..measure import block_reduce
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/skimage/measure/__init__.py", line 5, in <module>
+    from ._polygon import approximate_polygon, subdivide_polygon
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/skimage/measure/_polygon.py", line 2, in <module>
+    from scipy import signal
+  File "<frozen importlib._bootstrap>", line 1039, in _handle_fromlist
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/scipy/__init__.py", line 200, in __getattr__
+    return _importlib.import_module(f'scipy.{name}')
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/scipy/signal/__init__.py", line 331, in <module>
+    from ._peak_finding import *
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/scipy/signal/_peak_finding.py", line 8, in <module>
+    from scipy.stats import scoreatpercentile
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/scipy/stats/__init__.py", line 493, in <module>
+    from . import qmc
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/scipy/stats/qmc.py", line 235, in <module>
+    from ._qmc import *
+  File "/home/multi-gpu/anaconda3/envs/svtas/lib/python3.8/site-packages/scipy/stats/_qmc.py", line 35, in <module>
+    from ._sobol import (
+KeyboardInterrupt

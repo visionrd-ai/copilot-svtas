@@ -1,13 +1,14 @@
 import os
 import subprocess
 
-# Input paths
-video_dir = 'data/production/Videos'  
-label_dir = 'data/production/groundTruth' 
-output_dir = 'data/production/'
+video_dir = 'data/thal/Videos'  
+label_dir = 'data/thal/groundTruth' 
+output_dir = 'data/thal/'
 os.makedirs(output_dir, exist_ok=True)
 
-# Iterate over all videos in the video directory
+min_segment_length = 32 
+fps = 30  
+
 for video_file in os.listdir(video_dir):
     if not video_file.lower().endswith('.mp4'):
         continue
@@ -33,16 +34,18 @@ for video_file in os.listdir(video_dir):
         if label != 'background':
             if label != current_label:
                 if current_label is not None:
-                    segments.append((start_frame, frame - 1, current_label))
+                    if frame - start_frame >= min_segment_length:
+                        segments.append((start_frame, frame - 1, current_label))
                 start_frame = frame
                 current_label = label
         else:
             if current_label is not None:
-                segments.append((start_frame, frame - 1, current_label))
+                if frame - start_frame >= min_segment_length:
+                    segments.append((start_frame, frame - 1, current_label))
                 current_label = None
 
-    if current_label is not None:
-        segments.append((start_frame, frame, current_label))
+    if current_label is not None and (labels[-1][0] - start_frame + 1) >= min_segment_length:
+        segments.append((start_frame, labels[-1][0], current_label))
 
     # Create a directory for each video
     video_output_dir = os.path.join(output_dir, 'Videos')
@@ -52,7 +55,6 @@ for video_file in os.listdir(video_dir):
     os.makedirs(label_output_dir, exist_ok=True)
 
     # Trim videos and create new label files
-    fps = 30  # Assuming 30 frames per second
     for start_frame, end_frame, label in segments:
         start_time = start_frame / fps
         duration = (end_frame - start_frame + 1) / fps
