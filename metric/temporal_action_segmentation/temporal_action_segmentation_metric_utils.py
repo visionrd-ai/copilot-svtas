@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
 
-ignore_bg_class = ["bg", "None"]
+ignore_bg_class = ["ackgroundd", "None"]
 
 def get_labels_scores_start_end_time(input_np,
                                      frame_wise_labels,
@@ -364,7 +364,6 @@ def wrapper_compute_average_precision(prediction, ground_truth, tiou_thresholds,
             del activity_dict[label_name]
 
     ap = np.zeros((len(tiou_thresholds), len(activity_dict)))
-
     # Adaptation to query faster
     ground_truth_by_label = ground_truth.groupby('label')
     prediction_by_label = prediction.groupby('label')
@@ -378,6 +377,8 @@ def wrapper_compute_average_precision(prediction, ground_truth, tiou_thresholds,
             tiou_thresholds=tiou_thresholds,
         ) for label_name, cidx in activity_dict.items())
     for i, cidx in enumerate(activity_dict.values()):
-        ap[:, cidx] = results[i]
-
+        try:
+            ap[:, cidx] = results[i]
+        except:
+            import pdb; pdb.set_trace()
     return ap

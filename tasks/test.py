@@ -107,10 +107,10 @@ def test(cfg,
         checkpoint = torch.load(weights, map_location=map_location)
 
     state_dicts = checkpoint['model_state_dict']
-    # if nprocs > 1:
-    #     model.module.load_state_dict(state_dicts)
-    # else:
-    #     model.load_state_dict(state_dicts)
+    if nprocs > 1:
+        model.module.load_state_dict(state_dicts)
+    else:
+        model.load_state_dict(state_dicts)
 
     # if use_amp is True:
     #     amp.load_state_dict(checkpoint['amp'])

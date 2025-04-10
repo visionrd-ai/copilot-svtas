@@ -1,5 +1,6 @@
 absl-py
 addict
+albumentations
 astroid
 asttokens
 backcall
@@ -89,6 +90,7 @@ torch
 torch-tb-profiler
 torchaudio
 torchvision
+transformers
 tornado
 tqdm
 traitlets

@@ -89,14 +89,15 @@ class MemoryDilationResidualLyaer(nn.Module):
     def overlap_same_padding(self, x):
         if self.memory is None:
             self.memory = torch.zeros([x.shape[0], x.shape[1], self.dilation * 2]).to(x.device)
-        
+        if self.memory.shape[0] < x.shape[0]:
+            padding = torch.zeros([x.shape[0]-self.memory.shape[0], x.shape[1], self.dilation * 2]).to(x.device)
+            self.memory = torch.cat([self.memory, padding],dim=0)
         # overlap
         # print(x.shape)
         try:
             x = torch.cat([self.memory, x], dim=2)
         except: 
             print(x.shape, self.memory.shape)
-            import pdb; pdb.set_trace()
         self._memory(x)
         return x
     
