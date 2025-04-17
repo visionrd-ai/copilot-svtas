@@ -28,6 +28,32 @@ try:
 except:
     pass
 
+
+
+
+def load_heads(model, weights):
+    action_path = weights.replace('_latest_best', '_best_action')
+    branch_path = weights.replace('_latest_best', '_best_branch')
+    
+    branch_weight = torch.load(branch_path)
+    branch_weight = branch_weight['model_state_dict']
+    branch_head_weights = {}
+    for key, param in branch_weight.items():
+        if 'branch_head' in key:
+            branch_head_weights[key.replace('branch_head.', '')]   = param
+    model.branch_head.load_state_dict(branch_head_weights)
+    
+    action_weight = torch.load(action_path)
+    action_weight = action_weight['model_state_dict']
+    action_head_weights = {}
+    for key, param in action_weight.items():
+        if 'action_head' in key:
+            action_head_weights[key.replace('action_head.', '')]   = param
+    model.action_head.load_state_dict(action_head_weights)
+
+    return model
+
+
 @torch.no_grad()
 def test(cfg,
          args,
@@ -116,7 +142,11 @@ def test(cfg,
     #     amp.load_state_dict(checkpoint['amp'])
 
     # add params to metrics
-    Metric = metric_builder.build_metric(cfg.METRIC)
+
+    model = load_heads(model, weights)
+    
+    action_metric = metric_builder.build_metric(cfg.METRIC['action'])
+    branch_metric = metric_builder.build_metric(cfg.METRIC['branch'])
     
     record_dict = build_recod(cfg.MODEL.architecture, mode="validation")
 
@@ -124,7 +154,8 @@ def test(cfg,
 
     runner = Runner(logger=logger,
                 video_batch_size=video_batch_size,
-                Metric=Metric,
+                action_metric=action_metric,
+                branch_metric=branch_metric,
                 record_dict=record_dict,
                 cfg=cfg,
                 model=model,
@@ -146,7 +177,8 @@ def test(cfg,
 
     if local_rank <= 0:
         # metric output
-        runner.Metric.accumulate()
+        runner.action_metric.accumulate()
+        runner.branch_metric.accumulate()
 
         # model param flops caculate
         if cfg.MODEL.architecture not in ["FeatureSegmentation"]:

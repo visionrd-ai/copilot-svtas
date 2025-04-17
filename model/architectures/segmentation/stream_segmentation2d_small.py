@@ -47,9 +47,20 @@ class StreamSegmentation2D(nn.Module):
         # self.det_backbone = build_backbone(backbone)
 
         self.det_weights = torch.load('data/new_cleaned.pth')
+        # self.det_backbone =  ResNet(depth=34, pretrained='data/new_cleaned.pth')
+        import pdb; pdb.set_trace()
+        # self.det_backbone = ResNetModel.from_pretrained("microsoft/resnet-50")
+        # self.det_weights = {key.replace('backbone.', ''):val for key, val in torch.load('data/last_epoch_model.pth').items() if key.startswith('backbone.')}
+        # self.det_weights = torch.load('efficientEgoNet_bb_512x512.pth', map_location='cpu')
+        # self.det_backbone = torchvision.models.efficientnet_v2_s(weights=EfficientNet_V2_S_Weights)
+        # self.det_backbone =  torch.nn.Sequential(*(list(self.det_backbone.children())[:-2]))
+
 
         self.neck = build_neck(neck)
         self.head = build_head(head)
+
+        # self.backbone.init_weights()
+        # self.det_backbone.init_weights()
 
         self.feat_combine = torch.nn.Sequential(
             conv_bn_relu(in_channels=4096, out_channels=2048, kernel_size=3, padding=1, dilation=1),

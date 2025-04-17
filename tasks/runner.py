@@ -29,7 +29,8 @@ class Runner():
     def __init__(self,
                  logger,
                  video_batch_size,
-                 Metric,
+                 action_metric,
+                 branch_metric,
                  cfg,
                  model,
                  post_processing,
@@ -43,7 +44,9 @@ class Runner():
         self.optimizer = optimizer
         self.logger = logger
         self.video_batch_size = video_batch_size
-        self.Metric = Metric
+
+        self.action_metric = action_metric
+        self.branch_metric = branch_metric
         self.record_dict = record_dict
         self.cfg = cfg
         # self.model = model
@@ -193,13 +196,17 @@ class Runner():
 
         out = self.post_processing.output()
         outputs, ground_truth_list, vid = process_post_output(out[0], self.runner_mode, self.nprocs, self.current_step_vid_list)
+        
         if not vid: 
             import pdb; pdb.set_trace()
-        f1_action, acc_action = self.Metric.update(vid, ground_truth_list, outputs, action_dict_path='data/thal/mapping_tasks.txt')
+        
+        f1_action, acc_action = self.action_metric.update(vid, ground_truth_list, outputs, action_dict_path='data/thal/mapping_tasks.txt')
         outputs, ground_truth_list, vid = process_post_output(out[1], self.runner_mode, self.nprocs, self.current_step_vid_list)
+        
         if not vid: 
             import pdb; pdb.set_trace()
-        f1_branch, acc_branch = self.Metric.update(vid, ground_truth_list, outputs, action_dict_path='data/thal/mapping_branches.txt')
+
+        f1_branch, acc_branch = self.branch_metric.update(vid, ground_truth_list, outputs, action_dict_path='data/thal/mapping_branches.txt')
 
 
         self.current_step_vid_list = vid_list

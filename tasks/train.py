@@ -99,7 +99,8 @@ def train(cfg,
     # 3. build metirc
     metric_cfg = cfg.METRIC
     metric_cfg['train_mode'] = True
-    Metric = metric_builder.build_metric(metric_cfg)
+    action_metric = metric_builder.build_metric(metric_cfg['action'])
+    branch_metric = metric_builder.build_metric(metric_cfg['branch'])
 
     # Resume
     resume_epoch = cfg.get("resume_epoch", 0)
@@ -124,6 +125,13 @@ def train(cfg,
         if use_amp is True:
             amp.load_state_dict(checkpoint['amp'])
         resume_epoch = start_epoch
+    b_wt = torch.load('output/thal_production/thal_production_best_branch.pkl')
+    b_wt = b_wt['model_state_dict']
+    branch_head_weights = {}
+    for key, param in b_wt.items():
+        if 'branch_head' in key:
+            branch_head_weights[key.replace('branch_head.', '')]   = param
+    model.branch_head.load_state_dict(branch_head_weights)
     # 4. construct Pipeline
     train_Pipeline = dataset_builder.build_pipline(cfg.PIPELINE.train)
     val_Pipeline = dataset_builder.build_pipline(cfg.PIPELINE.test)
@@ -173,7 +181,8 @@ def train(cfg,
     runner = Runner(optimizer=optimizer,
                 logger=logger,
                 video_batch_size=video_batch_size,
-                Metric=Metric,
+                action_metric=action_metric,
+                branch_metric=branch_metric,
                 record_dict=record_dict,
                 cfg=cfg,
                 model=model,
@@ -182,7 +191,8 @@ def train(cfg,
                 use_amp=use_amp,
                 nprocs=nprocs,
                 local_rank=local_rank)
-    best = 0.0
+    best_action = 0.0
+    best_branch = 0.0
     for epoch in range(0, cfg.epochs):
         if epoch < resume_epoch:
             logger.info(
@@ -204,7 +214,9 @@ def train(cfg,
             
         if local_rank <= 0:
             # metric output
-            runner.Metric.accumulate()
+            runner.action_metric.accumulate()
+            runner.branch_metric.accumulate()
+            
         
         if local_rank >= 0:
             torch.distributed.barrier()
@@ -218,11 +230,12 @@ def train(cfg,
         if args.use_tensorboard and local_rank <= 0:
             tenorboard_log_epoch(record_dict, epoch + 1, "train", writer=tensorboard_writer)
 
-        def evaluate(best):
+        def evaluate(best_action, best_branch):
             record_dict = build_recod(cfg.MODEL.architecture, mode="validation")
             runner = Runner(logger=logger,
                 video_batch_size=video_batch_size,
-                Metric=Metric,
+                action_metric=action_metric,
+                branch_metric=branch_metric,
                 record_dict=record_dict,
                 cfg=cfg,
                 model=model,
@@ -243,13 +256,19 @@ def train(cfg,
                     runner.run_one_iter(data=data, r_tic=r_tic, epoch=epoch)
                 r_tic = time.time()
 
-            best_flag = False
+            best_action_flag = False
+            best_branch_flag = False
             if local_rank <= 0:
                 # metric output
-                Metric_dict = runner.Metric.accumulate()
-                if Metric_dict["Acc"] > best:
-                    best = Metric_dict["Acc"]
-                    best_flag = True
+                action_metric_dict = runner.action_metric.accumulate()
+                branch_metric_dict = runner.branch_metric.accumulate()
+                if action_metric_dict["Acc"] > best_action:
+                    best_action = action_metric_dict["Acc"]
+                    best_action_flag = True
+                
+                if branch_metric_dict["Acc"] > best_branch:
+                    best_branch = branch_metric_dict["Acc"]
+                    best_branch_flag = True
 
             ips = "avg_ips: {:.5f} instance/sec.".format(
                 video_batch_size * record_dict["batch_time"].count /
@@ -257,33 +276,55 @@ def train(cfg,
             log_epoch(record_dict, epoch + 1, "val", ips, logger)
             if args.use_tensorboard and local_rank <= 0:
                 tenorboard_log_epoch(record_dict, epoch + 1, "val", writer=tensorboard_writer)
-            return best, best_flag
+            return best_action, best_action_flag, best_branch, best_branch_flag, action_metric_dict["Acc"], branch_metric_dict["Acc"]
 
         # 5. Validation
         if validate and (epoch % cfg.get("val_interval", 1) == 0
                          or epoch == cfg.epochs - 1):
             with torch.no_grad():
-                best, save_best_flag = evaluate(best)
-            # save best
-            if save_best_flag:
+                prev_best_action, prev_best_branch = best_action, best_branch
+                best_action, best_action_flag, best_branch, best_branch_flag, current_action, current_branch = evaluate(best_action, best_branch)
+            
+            if best_action_flag or best_branch_flag:
                 if nprocs > 1:
                     model_weight_dict = model.module.state_dict()
                 else:
                     model_weight_dict = model.state_dict()
-                if use_amp is False:
-                    checkpoint = {"model_state_dict": model_weight_dict,
-                            "optimizer_state_dict": optimizer.state_dict(),
-                            "epoch": epoch}
-                else:
-                    checkpoint = {"model_state_dict": model_weight_dict,
-                            "optimizer_state_dict": optimizer.state_dict(),
-                            "amp": amp.state_dict(),
-                            "epoch": epoch}
-                torch.save(checkpoint,
-                    osp.join(output_dir, model_name + "_best.pkl"))
-                logger.info(
-                        f"Already save the best model (Acc){int(best * 10000) / 10000}"
+
+                # Base checkpoint dict
+                checkpoint = {
+                    "model_state_dict": model_weight_dict,
+                    "optimizer_state_dict": optimizer.state_dict(),
+                    "epoch": epoch,
+                }
+                if use_amp:
+                    checkpoint["amp"] = amp.state_dict()
+
+                if best_action_flag:
+                    torch.save(
+                        checkpoint,
+                        osp.join(output_dir, model_name + "_best_action.pkl")
                     )
+                    logger.info(
+                        f"Saved best action model | ActionAcc: {best_action:.3f}% (prev: {prev_best_action:.3f}%)"
+                    )
+
+                if best_branch_flag:
+                    torch.save(
+                        checkpoint,
+                        osp.join(output_dir, model_name + "_best_branch.pkl")
+                    )
+                    logger.info(
+                        f"Saved best branch model | BranchAcc: {best_branch:.3f}% (prev: {prev_best_branch:.3f}%)"
+                    )
+                torch.save(
+                    checkpoint,
+                    osp.join(output_dir, model_name + "_latest_best.pkl")
+                )
+                logger.info(
+                    f"Saved latest best model | ActionAcc: {current_action:.3f}% | BranchAcc: {current_branch:.3f}% (prev: {best_action:.3f}%, {best_branch:.3f}%)"
+                )
+
 
         # 6. Save model and optimizer
         if epoch % cfg.get("save_interval", 1) == 0 or epoch == cfg.epochs - 1 and local_rank <= 0:

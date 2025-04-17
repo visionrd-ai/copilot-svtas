@@ -4,22 +4,22 @@ import torch
 from torchvision import transforms
 import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
-from vfuseACT import vfuseACT_multihead
+from vfuseACT import vfuseACT_multihead_small
 import numpy as np 
 
 sample_rate = 4 
 clip_length = 32
 
-vid_path = 'recordings_2025-02-27 01:16:27 PM.mp4'
-mapping_actions = {int(elem.strip().split(' ')[0]): elem.strip().split(' ')[-1] for elem in open('../data/thal/mapping_tasks.txt','r').readlines()}#{int(elem.strip().split(' ')[0]): elem.strip().split(' ')[-1] for elem in open('mapping_tasks.txt', 'r').readlines()}
-mapping_branch  = {int(elem.strip().split(' ')[0]): elem.strip().split(' ')[-1] for elem in open('../data/thal/mapping_branches.txt','r').readlines()}#open('../data/thal/mapping_branches.txt','r')#{int(elem.strip().split(' ')[0]): elem.strip().split(' ')[-1] for elem in open('mapping_branches.txt', 'r').readlines()}
+vid_path = '/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/Videos/2.mp4'
+mapping_actions = {int(elem.strip().split(' ')[0]): elem.strip().split(' ')[-1] for elem in open('/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_tasks.txt','r').readlines()}#{int(elem.strip().split(' ')[0]): elem.strip().split(' ')[-1] for elem in open('mapping_tasks.txt', 'r').readlines()}
+mapping_branch  = {int(elem.strip().split(' ')[0]): elem.strip().split(' ')[-1] for elem in open('/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_branches.txt','r').readlines()}#open('../data/thal/mapping_branches.txt','r')#{int(elem.strip().split(' ')[0]): elem.strip().split(' ')[-1] for elem in open('mapping_branches.txt', 'r').readlines()}
  
 capture = cv2.VideoCapture(vid_path)
 fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
 output_fps = int(capture.get(cv2.CAP_PROP_FPS) / sample_rate)
 frame_width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
 frame_height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
-output_path = 'infer.mp4'
+output_path = 'infer3.mp4'
 video_writer = cv2.VideoWriter(output_path, fourcc, 30, (frame_width, frame_height))
 
 
@@ -29,11 +29,19 @@ video_writer = cv2.VideoWriter(output_path, fourcc, 30, (frame_width, frame_heig
 # if clip_length == 128: 
 #     path = path128 
 # else:
-path = '../output/Thal_amur_data/Thal_amur_data_best.pkl' 
+path = '../output/thal_production/thal_production_latest_best.pkl' 
 
-model = vfuseACT_multihead(clip_seg_num=clip_length//sample_rate)
+model = vfuseACT_multihead_small(clip_seg_num=clip_length//sample_rate)
 weights = torch.load(path)['model_state_dict']
 model.load_state_dict(weights)
+
+b_wt = torch.load('../output/thal_production/thal_production_best_branch.pkl')
+b_wt = b_wt['model_state_dict']
+branch_head_weights = {}
+for key, param in b_wt.items():
+    if 'branch_head' in key:
+        branch_head_weights[key.replace('branch_head.', '')]   = param
+model.branch_head.load_state_dict(branch_head_weights)
 
 # weights = {key.replace('conv.net', 'conv'):val for key, val in _weights.items()}
 
@@ -55,17 +63,7 @@ def preprocess_frame(frame):
     ])
     frame = Image.fromarray(frame.astype('uint8')[:,:,::-1])
     return transform(frame)
-    # transform = A.Compose([
-    #                         A.Resize(256,320),
-    #                         A.CenterCrop(224, 224),
-    #                         A.Normalize(
-    #                         mean=[0.485, 0.456, 0.406],
-    #                         std=[0.229, 0.224, 0.225],
-    #                         ),
-    #                         ToTensorV2(),
-    #                     ])
-    # frame = transform(image=frame)
-    # return frame['image']
+
 
 def postprocess_frame(frame_list, wh =  (1280, 720)):
     mean = torch.tensor([0.485, 0.456, 0.406])
@@ -85,9 +83,9 @@ def postprocess_outputs(outs, mapping_actions, mapping_branch, action_threshold=
     def process_scores(scores, mapping, default_idx, threshold):
         probs = torch.nn.functional.softmax(torch.tensor(scores), dim=-2).numpy()
         predicted_classes = np.argmax(probs, axis=-2)[0]
-        max_probs = np.max(probs, axis=-2)[0]
+        # max_probs = np.max(probs, axis=-2)[0]
         
-        predicted_classes[max_probs < threshold] = default_idx
+        # predicted_classes[max_probs < threshold] = default_idx
         mapped_preds = [mapping[elem] for elem in predicted_classes]
         
         return mapped_preds

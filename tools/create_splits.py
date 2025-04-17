@@ -18,7 +18,7 @@ def split_files_by_prefix(folder_path, prefixes, test_bundle, train_bundle):
 
 # Example usage
 folder_path = "data/thal/groundTruth"  # Change this to your folder path
-prefixes = ["8"]  # Add your prefixes here
+prefixes = ["2"]  # Add your prefixes here
 test_bundle = "data/thal/splits/test.bundle"
 train_bundle = "data/thal/splits/train.bundle"
 
