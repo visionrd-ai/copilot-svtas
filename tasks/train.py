@@ -17,7 +17,7 @@ from utils.recorder import build_recod
 import model.builder as model_builder
 import loader.builder as dataset_builder
 import optimizer.builder as optimizer_builder
-
+from utils.collect_env import load_heads
 import metric.builder as metric_builder
 from .runner import Runner
 
@@ -119,19 +119,13 @@ def train(cfg,
             model.module.load_state_dict(checkpoint['model_state_dict'])
         else:
             model.load_state_dict(checkpoint['model_state_dict'])
-
+            model = load_heads(model, path_checkpoint)
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         start_epoch = checkpoint['epoch']
         if use_amp is True:
             amp.load_state_dict(checkpoint['amp'])
         resume_epoch = start_epoch
-    b_wt = torch.load('output/thal_production/thal_production_best_branch.pkl')
-    b_wt = b_wt['model_state_dict']
-    branch_head_weights = {}
-    for key, param in b_wt.items():
-        if 'branch_head' in key:
-            branch_head_weights[key.replace('branch_head.', '')]   = param
-    model.branch_head.load_state_dict(branch_head_weights)
+    
     # 4. construct Pipeline
     train_Pipeline = dataset_builder.build_pipline(cfg.PIPELINE.train)
     val_Pipeline = dataset_builder.build_pipline(cfg.PIPELINE.test)
