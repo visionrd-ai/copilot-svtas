@@ -59,11 +59,11 @@ DATASET: #DATASET field
     train:
         name: "RawFrameStreamSegmentationDatasetMultiLabel"
         data_prefix: "./" 
-        file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/splits/train.bundle"
-        videos_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/Videos"
-        gt_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/groundTruth_split"
-        actions_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_tasks.txt"
-        branches_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_branches.txt"
+        file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal_dija/splits/train.bundle"
+        videos_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal_dija/Videos"
+        gt_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal_dija/groundTruth_split"
+        actions_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal_dija/mapping_tasks.txt"
+        branches_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal_dija/mapping_branches.txt"
         dataset_type: "gtea"
         train_mode: True
         sliding_window: 32
@@ -72,11 +72,11 @@ DATASET: #DATASET field
     test:
         name: "RawFrameStreamSegmentationDatasetMultiLabel"
         data_prefix: "./" 
-        file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/splits/test.bundle" 
-        videos_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/Videos"
-        gt_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/groundTruth_split"
-        actions_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_tasks.txt"
-        branches_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_branches.txt"
+        file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal_dija/splits/test.bundle" 
+        videos_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal_dija/Videos"
+        gt_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal_dija/groundTruth_split"
+        actions_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal_dija/mapping_tasks.txt"
+        branches_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal_dija/mapping_branches.txt"
         dataset_type: "gtea"
         train_mode: False
         sliding_window: 32
@@ -148,20 +148,18 @@ METRIC:
     action:
         name: "TASegmentationMetric"
         overlap: [.1, .25, .5]
-        actions_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_tasks.txt"
+        actions_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal_dija/mapping_tasks.txt"
         file_output: True
         score_output: True
-        output_dir: "output/results/thal_production/actions/"
     branch:
         name: "TASegmentationMetric"
         overlap: [.1, .25, .5]
-        actions_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_branches.txt"
+        actions_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal_dija/mapping_branches.txt"
         file_output: True
         score_output: True
-        output_dir: "output/results/thal_production/branches"
 
 
-model_name: "thal_production"
+model_name: "thal_dija_production"
 log_interval: 1 #Optional, the interal of logger, default:10
 epochs: 200 #Mandatory, total epoch
 save_interval: 50

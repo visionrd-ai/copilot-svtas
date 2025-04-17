@@ -200,8 +200,8 @@ class BaseTASegmentationMetric(BaseMetric):
         gt_content = list(gt_content)
 
         if self.file_output is True and self.train_mode is False:
-            self._write_seg_file(gt_content, vid + f'-{list(act_dict.keys())[0]}-gt', self.output_dir)
-            self._write_seg_file(recog_content, vid + f'-{list(act_dict.keys())[0]}-pred', self.output_dir)
+            self._write_seg_file(gt_content, vid + f'_gt', self.output_dir)
+            self._write_seg_file(recog_content, vid + f'_pred', self.output_dir)
         try:
             pred_detection = get_labels_scores_start_end_time(
                 outputs_arr, recog_content, act_dict)

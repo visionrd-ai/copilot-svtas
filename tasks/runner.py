@@ -200,13 +200,13 @@ class Runner():
         if not vid: 
             import pdb; pdb.set_trace()
         
-        f1_action, acc_action = self.action_metric.update(vid, ground_truth_list, outputs, action_dict_path='data/thal/mapping_tasks.txt')
+        f1_action, acc_action = self.action_metric.update(vid, ground_truth_list, outputs, action_dict_path='/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_tasks.txt')
         outputs, ground_truth_list, vid = process_post_output(out[1], self.runner_mode, self.nprocs, self.current_step_vid_list)
         
         if not vid: 
             import pdb; pdb.set_trace()
 
-        f1_branch, acc_branch = self.branch_metric.update(vid, ground_truth_list, outputs, action_dict_path='data/thal/mapping_branches.txt')
+        f1_branch, acc_branch = self.branch_metric.update(vid, ground_truth_list, outputs, action_dict_path='/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_branches.txt')
 
 
         self.current_step_vid_list = vid_list
