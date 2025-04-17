@@ -5,11 +5,11 @@ MODEL:
         pretrained: "data/clsLess_tsm_r50_256p_1x1x8_kinetics400_rgb_.pth"
         clip_seg_num: 8
         shift_div: 8
-        out_indices: (2, )
+        out_indices: (3, )
     neck:
         name: "AvgPoolNeck"
         num_classes: 37
-        in_channels: 1024
+        in_channels: 2048
         clip_seg_num: 8
         drop_ratio: 0.5
         need_pool: True
@@ -19,15 +19,15 @@ MODEL:
             num_stages: 1
             num_layers: 4
             num_f_maps: 64
-            dim: 1024
+            dim: 2048
             num_classes: 11
             sample_rate: 4
         branch_head:
             name: "MemoryTCNHead"
             num_stages: 1
             num_layers: 4
-            num_f_maps: 256
-            dim: 1024
+            num_f_maps: 64
+            dim: 2048
             num_classes: 26
             sample_rate: 4
         sample_rate: 4
@@ -59,11 +59,11 @@ DATASET: #DATASET field
     train:
         name: "RawFrameStreamSegmentationDatasetMultiLabel"
         data_prefix: "./" 
-        file_path: "./data/thal/splits/train.bundle"
-        videos_path: "./data/thal/Videos"
-        gt_path: "./data/thal/groundTruth_split"
-        actions_map_file_path: "./data/thal/mapping_tasks.txt"
-        branches_map_file_path: "./data/thal/mapping_branches.txt"
+        file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/splits/test_dummy.bundle"
+        videos_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/Videos"
+        gt_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/groundTruth_split"
+        actions_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_tasks.txt"
+        branches_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_branches.txt"
         dataset_type: "gtea"
         train_mode: True
         sliding_window: 32
@@ -72,11 +72,11 @@ DATASET: #DATASET field
     test:
         name: "RawFrameStreamSegmentationDatasetMultiLabel"
         data_prefix: "./" 
-        file_path: "./data/thal/splits/test.bundle" 
-        videos_path: "./data/thal/Videos"
-        gt_path: "./data/thal/groundTruth_split"
-        actions_map_file_path: "./data/thal/mapping_tasks.txt"
-        branches_map_file_path: "./data/thal/mapping_branches.txt"
+        file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/splits/test_dummy.bundle" 
+        videos_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/Videos"
+        gt_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/groundTruth_split"
+        actions_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_tasks.txt"
+        branches_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_branches.txt"
         dataset_type: "gtea"
         train_mode: False
         sliding_window: 32
@@ -103,7 +103,6 @@ PIPELINE:
                     size: [224, 224] 
                 # - RandomCrop:
                 #     size: 224
-                - RandomHorizontalFlip:
                 - ToTensor:
                 - Normalize:
                     mean: [0.485, 0.456, 0.406]
@@ -148,18 +147,20 @@ METRIC:
     action:
         name: "TASegmentationMetric"
         overlap: [.1, .25, .5]
-        actions_map_file_path: "./data/thal/mapping_tasks.txt"
+        actions_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_tasks.txt"
         file_output: True
         score_output: True
+        output_dir: "output/results/thal_production_train/actions/"
     branch:
         name: "TASegmentationMetric"
         overlap: [.1, .25, .5]
-        actions_map_file_path: "./data/thal/mapping_branches.txt"
+        actions_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_branches.txt"
         file_output: True
         score_output: True
+        output_dir: "output/results/thal_production_train/branches"
 
 
-model_name: "thal_testing"
+model_name: "thal_production"
 log_interval: 1 #Optional, the interal of logger, default:10
 epochs: 200 #Mandatory, total epoch
 save_interval: 50

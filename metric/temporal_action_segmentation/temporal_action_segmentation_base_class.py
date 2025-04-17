@@ -240,7 +240,6 @@ class BaseTASegmentationMetric(BaseMetric):
         # localization metric
         prediction = pd.DataFrame(self.pred_results_dict)
         ground_truth = pd.DataFrame(self.gt_results_dict)
-
         ap = wrapper_compute_average_precision(prediction, ground_truth,
                                                self.tiou_thresholds,
                                                self.actions_dict)

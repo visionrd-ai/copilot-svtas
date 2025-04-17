@@ -39,6 +39,7 @@ class ScorePostProcessing():
         pred_score_list = []
         pred_cls_list = []
         ground_truth_list = []
+        import pdb; pdb.set_trace()
 
         for bs in range(self.pred_scores.shape[0]):
             index = np.where(self.video_gt[bs, :] == self.ignore_index)

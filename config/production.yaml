@@ -103,7 +103,6 @@ PIPELINE:
                     size: [224, 224] 
                 # - RandomCrop:
                 #     size: 224
-                - RandomHorizontalFlip:
                 - ToTensor:
                 - Normalize:
                     mean: [0.485, 0.456, 0.406]
@@ -151,14 +150,14 @@ METRIC:
         actions_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_tasks.txt"
         file_output: True
         score_output: True
-        output_dir: "output/results/thal_production/actions/"
+        output_dir: "output/results/thal_production_test/actions/"
     branch:
         name: "TASegmentationMetric"
         overlap: [.1, .25, .5]
         actions_map_file_path: "/home/multi-gpu/amur/copilot/copilot-svtas/data/thal/mapping_branches.txt"
         file_output: True
         score_output: True
-        output_dir: "output/results/thal_production/branches"
+        output_dir: "output/results/thal_production_test/branches"
 
 
 model_name: "thal_production"

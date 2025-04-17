@@ -12,7 +12,7 @@ from .runner import Runner
 from utils.recorder import build_recod
 import time
 import numpy as np
-
+import os 
 import model.builder as model_builder
 import loader.builder as dataset_builder
 import metric.builder as metric_builder
@@ -28,10 +28,7 @@ try:
 except:
     pass
 
-
-
-
-
+from tools.get_task_accuracy import get_taskwise_metrics
 
 
 @torch.no_grad()
@@ -185,6 +182,11 @@ def test(cfg,
                 label = torch.ones([optimal_batch_size] + labels_shape).cuda()
                 return dict(input_data=dict(feature=x, masks=mask, labels=label))
             dummy_input = input_constructor(input_shape)
+    print("\nTaskwise Metrics:")
+    taskwise_metrics = get_taskwise_metrics(os.path.dirname(cfg.METRIC['action']['output_dir'].rstrip('/')))
+    print("Average Taskwise Metrics:")
+    print(taskwise_metrics)
+
         # print(model)
         # tensorboard_writer.add_graph(model, input_to_model=[x, mask, torch.ones(1).cuda()])
 

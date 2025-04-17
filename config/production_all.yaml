@@ -103,7 +103,6 @@ PIPELINE:
                     size: [224, 224] 
                 # - RandomCrop:
                 #     size: 224
-                - RandomHorizontalFlip:
                 - ToTensor:
                 - Normalize:
                     mean: [0.485, 0.456, 0.406]

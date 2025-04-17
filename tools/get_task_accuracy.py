@@ -1,5 +1,10 @@
 import os
 import re
+
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+import numpy as np
+import editdistance
+
 def merge_gt_pred(root_folder):
     actions_folder = os.path.join(root_folder, 'actions')
     branches_folder = os.path.join(root_folder, 'branches')
@@ -36,10 +41,6 @@ def merge_gt_pred(root_folder):
 
     return merged_gt, merged_pred
 
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support
-import numpy as np
-import editdistance
-
 def compute_dataset_metrics(merged_gt, merged_pred):
     all_metrics = {
         'accuracy': [],
@@ -72,14 +73,23 @@ def compute_dataset_metrics(merged_gt, merged_pred):
         all_metrics['f1_score'].append(f1)
         all_metrics['normalized_edit_distance'].append(norm_ed)
 
+        print(f"\nMetrics for {key}:")
+        print(f"  Accuracy: {acc:.4f}")
+        print(f"  Precision: {precision:.4f}")
+        print(f"  Recall: {recall:.4f}")
+        print(f"  F1 Score: {f1:.4f}")
+        print(f"  Normalized Edit Distance: {norm_ed:.4f}")
+
+
     avg_metrics = {k: sum(v)/len(v) if v else 0.0 for k, v in all_metrics.items()}
     return avg_metrics
 
+def get_taskwise_metrics(folder_path):
+    return compute_dataset_metrics(*merge_gt_pred(folder_path))
 
 
+# merged_gt, merged_pred = merge_gt_pred('output/results/thal_production')
+# metrics = compute_dataset_metrics(merged_gt, merged_pred)
 
-merged_gt, merged_pred = merge_gt_pred('output/results/thal_production')
-metrics = compute_dataset_metrics(merged_gt, merged_pred)
 
-
-import pdb; pdb.set_trace()
+# import pdb; pdb.set_trace()
