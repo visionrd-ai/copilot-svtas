@@ -1,4 +1,5 @@
 import cv2
+import os 
 
 def plot_labels_on_video(input_video_path, labels_txt_path1, labels_txt_path2, output_video_path, font_scale=1, font_thickness=2):
     # Open the video
@@ -59,8 +60,9 @@ def plot_labels_on_video(input_video_path, labels_txt_path1, labels_txt_path2, o
     print(f"Plotted video saved at {output_video_path}")
 
 # Example usage
-input_video = 'data/thal/Videos/IMG_4579_counter.mp4'
-labels_txt1 = 'output/results/pred_gt_list/IMG_4579_counter-gt.txt'
-labels_txt2 = 'output/results/pred_gt_list/IMG_4579_counter-pred.txt'
-output_video = 'vis/IMG_4579_counter.mp4'
+input_video = '/home/multi-gpu/amur/copilot/copilot-svtas/data/thal_dija/Videos/1.mp4'
+labels_txt1 = 'output/1.txt'
+labels_txt2 = 'output/1.txt'
+output_video = 'vis/1_plot.mp4'
+os.makedirs('vis', exist_ok=True)
 plot_labels_on_video(input_video, labels_txt1, labels_txt2, output_video)
