@@ -28,7 +28,7 @@ try:
 except:
     pass
 
-from tools.get_task_accuracy import get_taskwise_metrics
+from tools.get_task_accuracy import get_all_metrics
 
 
 @torch.no_grad()
@@ -182,9 +182,8 @@ def test(cfg,
                 label = torch.ones([optimal_batch_size] + labels_shape).cuda()
                 return dict(input_data=dict(feature=x, masks=mask, labels=label))
             dummy_input = input_constructor(input_shape)
-    print("\nTaskwise Metrics:")
-    taskwise_metrics = get_taskwise_metrics(os.path.dirname(cfg.METRIC['action']['output_dir'].rstrip('/')))
-    print("Average Taskwise Metrics:")
+    taskwise_metrics = get_all_metrics(os.path.dirname(cfg.METRIC['action']['output_dir'].rstrip('/')), log_file=cfg.METRIC['action']['output_dir'] + '/taskwise_metrics.log')  
+    print("Taskwise Metrics:")
     print(taskwise_metrics)
 
         # print(model)
