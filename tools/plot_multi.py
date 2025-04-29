@@ -65,11 +65,11 @@ def plot_labels_on_video(input_video_path, gt_txt_path1, gt_txt_path2, pred_txt_
     print(f"Plotted video saved at {output_video_path}")
 
 # Example usage
-input_video = '/home/multi-gpu/amur/copilot/copilot-svtas/data/thal_dija/Videos/23.mp4'
-gt_txt1 = 'output/results/thal_production_cloud/actions/23_gt.txt'
-gt_txt2 = 'output/results/thal_production_cloud/branches/23_gt.txt'
-pred_txt1 = 'output/results/thal_production_cloud/actions/23_pred.txt'
-pred_txt2 = 'output/results/thal_production_cloud/branches/23_pred.txt'
-output_video = 'vis/23_infer.mp4'
+input_video = 'data/thal_all_fixed/Videos/2.mp4'
+gt_txt1 = 'output/results/thal_fixed_annos/actions/2_gt.txt'
+gt_txt2 =  'output/results/thal_fixed_annos/branches/2_gt.txt'
+pred_txt1 =  'output/results/thal_fixed_annos/actions/2_pred.txt'
+pred_txt2 = 'output/results/thal_fixed_annos/branches/2_pred.txt'
+output_video = 'vis/2_latest.mp4'
 
 plot_labels_on_video(input_video, gt_txt1, gt_txt2, pred_txt1, pred_txt2, output_video)

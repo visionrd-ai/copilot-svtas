@@ -4,9 +4,9 @@ import re
 
 # ------------------- Trimming Part -------------------
 
-video_dir = 'data/thal/Videos'  
-label_dir = 'data/thal/groundTruth' 
-output_dir = 'data/thal/'
+video_dir = 'data/thal_all_fixed/Videos'  
+label_dir = 'data/thal_all_fixed/groundTruth' 
+output_dir = 'data/thal_all_fixed/'
 os.makedirs(output_dir, exist_ok=True)
 
 min_segment_length = 32  # Minimum number of frames per segment
@@ -99,9 +99,8 @@ def split_files_by_prefix(folder_path, prefixes, test_bundle, train_bundle):
     print(f"Test bundle saved to {test_bundle}")
     print(f"Train bundle saved to {train_bundle}")
 
-# Create splits after trimming
 split_folder = os.path.join(output_dir, "groundTruth")
-prefixes = ["8"]  # Add desired prefixes here
+prefixes = ["15", "6_14_apr_2025","2", "3_14_apr_2025"] 
 splits_dir = os.path.join(output_dir, "splits")
 os.makedirs(splits_dir, exist_ok=True)
 
@@ -110,7 +109,6 @@ train_bundle = os.path.join(splits_dir, "train.bundle")
 
 split_files_by_prefix(split_folder, prefixes, test_bundle, train_bundle)
 
-# ------------------- Label Post-Processing Part -------------------
 
 def process_label_files(input_folder, output_folder):
     os.makedirs(output_folder, exist_ok=True)
