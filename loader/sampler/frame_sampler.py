@@ -97,7 +97,6 @@ class VideoStreamSampler():
             augmented_frame = A.ReplayCompose.replay(replay_data, image=np_frames[i])['image']
             augmented_video[i] = augmented_frame
         np_frames = augmented_video
-        import pdb; pdb.set_trace()
         for i in range(np_frames.shape[0]):
             imgbuf = np_frames[i].copy()
             imgs.append(Image.fromarray(imgbuf, mode=self.channel_mode))

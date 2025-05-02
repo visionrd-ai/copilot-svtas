@@ -107,7 +107,6 @@ class SegmentationLoss(nn.Module):
     def forward(self, model_output, input_data):
         # score shape [stage_num N C T]
         # masks shape [N T]
-        import pdb; pdb.set_trace()
         head_score = model_output
         masks, labels, precise_sliding_num = input_data["masks"], input_data["labels"], input_data['precise_sliding_num']
         _, b, _, t = head_score.shape

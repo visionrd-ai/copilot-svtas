@@ -14,8 +14,8 @@ import torch
 import os
 
 from utils.config import get_config
-from tasks.test import test
-from tasks.train import train
+from tasks.test import test, test_singlehead
+from tasks.train import train, train_singlehead
 
 def parse_args():
     parser = argparse.ArgumentParser("SVTAS train script")
@@ -69,6 +69,12 @@ def parse_args():
         choices=['none', 'pytorch'],
         default='none',
         help='job launcher')
+    parser.add_argument(
+        '--single_head',
+        type=bool,
+        default=False,
+        help='Single head training (True) or multi head training (False)'
+    )
     args = parser.parse_args()
     # if 'LOCAL_RANK' not in os.environ:
     #     os.environ['LOCAL_RANK'] = str(args.local_rank)
@@ -107,21 +113,38 @@ def main():
         torch.backends.cudnn.benchmark = False
 
     print(local_rank)
-    if args.test:
-        test(cfg,
-             args=args,
-             local_rank=local_rank,
-             nprocs=nprocs,
-             use_amp=args.use_amp,
-             weights=args.weights)
+    if args.single_head: 
+        if args.test:
+            test_singlehead(cfg,
+                args=args,
+                local_rank=local_rank,
+                nprocs=nprocs,
+                use_amp=args.use_amp,
+                weights=args.weights)
+        else:
+            train_singlehead(cfg,
+                args=args,
+                local_rank=local_rank,
+                nprocs=nprocs,
+                use_amp=args.use_amp,
+                weights=args.weights,
+                validate=args.validate)
     else:
-        train(cfg,
-            args=args,
-            local_rank=local_rank,
-            nprocs=nprocs,
-            use_amp=args.use_amp,
-            weights=args.weights,
-            validate=args.validate)
+        if args.test:
+            test(cfg,
+                args=args,
+                local_rank=local_rank,
+                nprocs=nprocs,
+                use_amp=args.use_amp,
+                weights=args.weights)
+        else:
+            train(cfg,
+                args=args,
+                local_rank=local_rank,
+                nprocs=nprocs,
+                use_amp=args.use_amp,
+                weights=args.weights,
+                validate=args.validate)
 
 
 if __name__ == '__main__':

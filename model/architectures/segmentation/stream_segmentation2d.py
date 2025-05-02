@@ -103,7 +103,6 @@ class StreamSegmentation2D(nn.Module):
         imgs = input_data['imgs']
         # masks.shape=[N,T]
         masks = masks.unsqueeze(1)
-        import pdb; pdb.set_trace()
         # x.shape=[N,T,C,H,W], for most commonly case
         imgs = torch.reshape(imgs, [-1] + list(imgs.shape[2:]))
         # x [N * T, C, H, W]
@@ -118,7 +117,6 @@ class StreamSegmentation2D(nn.Module):
         else:
             feature = imgs
         
-        feature = self.feature_fusion(feature, feature_det)
         # feature = 0.5*feature+0.5*feature_det
         # feature [N * T , F_dim, 7, 7]
         # step 3 extract memory feature
